@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- Mirrored from www.webappli.eu/peyrot/renault/espace/index.php by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 26 Jun 2023 09:08:32 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="utf-8">
+    <title>Nouveau RENAULT Espace</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Nouveau RENAULT Espace Groupe PEYROT" name="keywords">
+    <meta content="Nouveau RENAULT Espace Groupe PEYROT" name="description">
+
+    <!-- Favicon -->
+    <link href="img/favicon.html" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com/">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&amp;family=Rubik&amp;display=swap" rel="stylesheet"> 
+
+    <!-- Font Awesome -->
+    <link href="cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="lib/lightbox/css/lightbox.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+      <!-- Pickr CSS -->
+      <link href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/classic.min.css" rel="stylesheet" />
+    
+</head>
+
+<body>
+    <!-- Navbar Start -->
+
+	    <div class="container-fluid bg-white position-relative">
+        <nav class="navbar navbar-expand-xl bg-white navbar-light py-3 py-lg-0">
+            <div id ="titre-principal" class="form-check">
+                <a href="index.html" class="navbar-brand text-secondary">
+                    <h1 class="display-4 text-uppercase">{{titre}}</h1>
+                </a>
+            </div>
+            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav ml-auto">
+                <div class="d-none d-xl-flex align-items-center pl-4"> 
+                    <img src="img/GROUPEPEYROT_Logo_RVB_Positif_72dpi_ok_format_logo.png" width="300">
+                </div>
+            </ul>
+            </div>
+        </nav>
+        </div>    <!-- Navbar End -->
+
+
+    <!-- Header Start -->
+    <div id="background-color">
+        <div class="container-fluid py-5 px-0 " style="margin-bottom: 90px;" :style="{ backgroundColor: backgroundColor }">
+            <div class="row mx-0 align-items-center">
+                <div class="col-lg-6 px-md-5 text-center text-lg-left">
+
+                    <div id="nouveau-modele" class="row">
+                            <h1 class="col-12 display-2 text-uppercase mb-3">{{titre}}</h1>
+                    </div>
+
+                    <div id="description-modele" class="form-group row">
+                        <p class="text-dark mb-4 col-12"><big>{{description}}</big></p>
+                    </div>    
+                        <a href="concession.html" target="_parent" class="btn btn-dark text-uppercase mt-1 py-3 px-5">Démarrez l'expèrience</a>
+                    </div>
+
+                    <div id="photo-change" class="col-lg-6 px-0 text-right">
+                            <input type="file" @change="handleImageChange" style="display: none;">
+                        <img :src="imagePath" alt="Photo">
+                    </div>
+                </div>   
+            </div>
+        </div>
+    </div>
+    <!-- Header End -->
+
+
+   
+    <!-- Footer Start -->
+	    <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-md-5" style="margin-top: 90px;">
+        <div class="row pt-5">
+            <div class="col-lg-3 col-md-6 mb-5">
+                <a href="index-2.html" class="navbar-brand">
+                    <h1 class="m-0 mt-n2 text-white display-5">Groupe PEYROT</h1>
+                </a>
+                <p>Nouveau Renault Espace<br>Essais gamme E-tech</p>
+                
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">
+                
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">
+                
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">
+                
+            </div>
+        </div>
+    </div>
+   <!-- Footer End -->
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="fa fa-angle-up"></i></a>
+
+
+    <!-- JavaScript Libraries -->
+    <script src="code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="lib/isotope/isotope.pkgd.min.js"></script>
+    <script src="lib/lightbox/js/lightbox.min.js"></script>
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.8.0/dist/pickr.min.js"></script>
+    <!-- Contact Javascript File -->
+    <script src="mail/jqBootstrapValidation.min.js"></script>
+    <script src="mail/contact.js"></script>
+    
+    <!-- Template Javascript -->
+    <script src="js/main.js"></script>
+    <script src="js/Vue.js"></script>
+</body>
+
+
+<!-- Mirrored from www.webappli.eu/peyrot/renault/espace/index.php by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 26 Jun 2023 09:08:32 GMT -->
+</html>
