@@ -1,17 +1,24 @@
 const appDeroulante = Vue.createApp({
   data() {
     return {
-      section: ''
+      concessions: [],
+      section: '',
+      concessionInput: ''
     };
   },
   methods: {
     changeSection(newSection) {
-      console.log("modification")
       this.section = newSection;
+    },
+    ajouterConcession() {
+      this.concessions.push(this.concessionInput);
+      this.concessionInput = '';
     }
   }
 });
+
 appDeroulante.mount('#menu_deroulant_container');
+
 // Fonction qui permet d'initialiser Vue.js
 
 /*****************************************
@@ -134,6 +141,8 @@ const app = Vue.createApp({
   }
 });
 app.mount('#background-color');
+
+
 
 
 
