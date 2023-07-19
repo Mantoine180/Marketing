@@ -1,4 +1,17 @@
-
+const appDeroulante = Vue.createApp({
+  data() {
+    return {
+      section: ''
+    };
+  },
+  methods: {
+    changeSection(newSection) {
+      console.log("modification")
+      this.section = newSection;
+    }
+  }
+});
+appDeroulante.mount('#menu_deroulant_container');
 // Fonction qui permet d'initialiser Vue.js
 
 /*****************************************
@@ -122,24 +135,5 @@ const app = Vue.createApp({
 });
 app.mount('#background-color');
 
-const appDeroulante = Vue.createApp({
-  setup() {
-    const section = Vue.reactive({
-      value: ''
-    });
 
-    const changeSection = (newSection) => {
-      console.log('Changing section to:', newSection);
-      section.value = newSection;
-    };
 
-    console.log('Component mounted');
-
-    return {
-      section,
-      changeSection,
-    };
-  },
-});
-
-appDeroulante.mount('#menu_deroulant_container');
