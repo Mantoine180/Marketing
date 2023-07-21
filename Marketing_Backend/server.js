@@ -1,11 +1,13 @@
 const express = require('express');
 const routes = require('./routes'); // Assurez-vous que le chemin d'accès est correct
 const { sequelize } = require('./db'); // Importer l'instance Sequelize
+const cors = require('cors');
 
 const app = express();
 const port = 3000;
 
 app.use(express.json()); // Middleware pour parser les requêtes JSON
+app.use(cors());// Active les en-têtes CORS pour toutes les routes
 
 app.use('/', routes); // Utiliser les routes définies dans routes.js
 

@@ -1,6 +1,9 @@
+
 const appDeroulante = Vue.createApp({
+  
   data() {
     return {
+      horaires:[],
       concessions: [],
       section: '',
       concessionInput: ''
@@ -10,11 +13,49 @@ const appDeroulante = Vue.createApp({
     changeSection(newSection) {
       this.section = newSection;
     },
-    ajouterConcession() {
-      this.concessions.push(this.concessionInput);
-      this.concessionInput = '';
+    async fetchConcessions() {
+      try {
+        const response = await fetch('http://localhost:3000/api/concession');
+        const data = await response.json();
+        this.concessions = data;
+      } catch (error) {
+        console.error('Error fetching concessions:', error);
+      }
+    },
+    async ajouterConcession() {
+      const nouvelleConcession = this.concessionInput.trim();
+
+  // Vérifiez si nouvelleConcession n'est pas vide avant de l'envoyer au serveur
+      if (nouvelleConcession !== '' && !this.concessions.includes(nouvelleConcession)) {
+        this.concessions.push(nouvelleConcession);
+        try {
+          const response = await fetch('http://localhost:3000/api/concession', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ nomConcession: nouvelleConcession }) // Assurez-vous que la clé est "nomConcession"
+          });
+          const data = await response.json();
+          this.concessionInput = ''; // Réinitialiser l'entrée de la concession
+        } catch (error) {
+          console.error('Error adding concession:', error);
+        }
+      }
+    },
+    supprimerConcession(concession){
+      const index = this.concessions.indexOf(concession);
+      if (index !== -1) {
+        this.concessions.splice(index, 1);
+      }
+    },
+    supprimerConcessions(){
+      this.concessions=[];
     }
-  }
+  },
+  mounted(){
+    this.fetchConcessions();
+  },
 });
 
 appDeroulante.mount('#menu_deroulant_container');

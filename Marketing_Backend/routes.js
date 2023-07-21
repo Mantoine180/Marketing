@@ -7,10 +7,22 @@ router.get('/', (req, res) => {
 });
 
 router.get('/api/concession', async (req, res) => {
-  console.log(Concession);
-  const concessions = await Concession.findAll();
-  res.json(concessions);
+  try {
+    const concessions = await Concession.findAll({
+      raw: true, // Récupérer les données brutes (JSON) sans le nom de la table
+      attributes: ['nomConcession'], // Inclure uniquement le champ nomConcession dans la réponse
+    });
+
+    // Extraire uniquement les noms de concession à partir des résultats
+    const nomsConcessions = concessions.map(concession => concession.nomConcession);
+
+    res.json(nomsConcessions);
+  } catch (error) {
+    console.error('Error fetching concessions:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
+
 
 router.post('/api/concession', async (req, res) => {
   const data = req.body;
