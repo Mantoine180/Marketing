@@ -37,9 +37,15 @@ const appDeroulante = Vue.createApp({
     /***************************************************************************************
     **************************************************************************************** 
     ****************************************************************************************/
-
-
-
+    async fetchHoraires() {
+      try {
+        const response = await fetch('http://localhost:3000//api/horaires');
+        const data = await response.json();
+        this.horaires = data;
+      } catch (error) {
+        console.error('Error fetching concessions:', error);
+      }
+    },
     /**************************************************************************************
     * 
     * Ajouter une concession
@@ -146,7 +152,24 @@ const appDeroulante = Vue.createApp({
             console.log(this.horaires[i]);
           }
      // Affiche le premier élément du tableau
+     const horairesData = this.horaires; // Tableau des horaires à envoyer au serveur
 
+     // Effectuer la requête POST vers le serveur
+     fetch('http://localhost:3000/api/horaires', {
+       method: 'POST',
+       headers: {
+         'Content-Type': 'application/json'
+       },
+       body: JSON.stringify({ horaires: horairesData })
+     })
+       .then(response => response.json())
+       .then(data => {
+         // Traitement de la réponse du serveur si nécessaire
+         console.log(data);
+       })
+       .catch(error => {
+         console.error('Error sending horaires:', error);
+       });      
     },
     ajoutertableau(debut,fin,ecartCreneaux){
       while (debut < fin) {
@@ -157,10 +180,7 @@ const appDeroulante = Vue.createApp({
         // Ajouter le créneau horaire au tableau
         if(debut<=fin)
         {
-          this.horaires.push({
-            heureDebut: heureDebutCreneau,
-            heureFin: heureFinCreneau,
-          });
+            this.horaires.push(`${heureDebutCreneau} - ${heureFinCreneau}`);
         }
       }
     },
@@ -172,6 +192,7 @@ const appDeroulante = Vue.createApp({
   },
   mounted(){
     this.fetchConcessions();
+    this.fetchHoraires();
   },
 });
 

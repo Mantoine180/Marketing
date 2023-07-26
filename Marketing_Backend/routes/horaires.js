@@ -21,47 +21,28 @@ horaires.get('/', async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
     }
   });
-module.exports = horaires;
-/*horaires.post('/', async (req, res) => {
-  /*const data = req.body;
 
-  const concessionCreated = await Concession.create(data);
-  res.json(concessionCreated);
-});
-
-horaires.delete('/', async (req, res) => {
-  try {
-    // Effacer toutes les données de la table Concession
-    await Concession.destroy({
-      where: {},
-      truncate: true
-    });
-
-    res.json({ message: 'All horaires deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting horaires:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-horaires.delete('/:concession', async (req, res) => {
-  const { concession } = req.params;
-  
-  try {
-    const deletedConcession = await Concession.destroy({
-      where: {
-        nomConcession: concession
+  horaires.post('/', async (req, res) => {
+    try {
+      const horairesData = req.body.horaires; // Assurez-vous que le client envoie les données du tableau horaires dans le corps de la requête POST
+      if (!horairesData || !Array.isArray(horairesData)) {
+        return res.status(400).json({ error: 'Invalid data format' });
       }
-    });
-
-    if (deletedConcession === 1) {
-      res.json({ message: 'The concession deleted successfully' });
-    } else {
-      res.status(404).json({ error: 'Concession not found' });
+  
+      // Boucle pour insérer les horaires dans la base de données
+      for (const horaire of horairesData) {
+        await CreneauHoraire.create({
+          heureDebut: horaire.heureDebut,
+          heureFin: horaire.heureFin
+        });
+      }
+  
+      res.status(201).json({ message: 'Horaires inserted successfully' });
+    } catch (error) {
+      console.error('Error inserting horaires:', error);
+      res.status(500).json({ error: 'Internal server error' });
     }
-  } catch (error) {
-    console.error('Error deleting concession:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-})*/;
+  });
+
+module.exports = horaires;
 
