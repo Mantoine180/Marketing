@@ -127,18 +127,41 @@
         </div>
 
         <div class="section" v-if="section === 'section2'">
-            <form @submit.prevent="ajouterConcession">
-              <div class="form-group">
-                <div class="input-group">
-                  <input type="text" class="form-control" id="formGroupExampleInput" v-model="concessionInput" placeholder="Nom de la concession">
-                  <button type="submit" class="btn btn-primary">Ajouter une horaire</button>
-                </div>
-              </div>
-            </form>
-          </div>
+            <form @submit.prevent="ajouterHoraires">
+              <input type="time" v-model="morningStart" min="08:00" max="11:00" required>
+              <small>Choisir l'heure de début du matin</small><br>
+          
+              <input type="time" v-model="pauseTime" min="11:30" max="14:00" required>
+              <small>Choisir l'heure de la pause</small><br>
+          
+              <input type="time" v-model="afternoonStart" min="13:00" max="17:00" required>
+              <small>Choisir l'heure de début de l'après-midi</small><br>
+          
+              <input type="time" v-model="afternoonEnd" min="17:30" max="19:00" required>
+              <small>Choisir l'heure de fin de l'après-midi</small><br>
+          
+              <input type="number" class="form-control" v-model="ecartCreneaux" placeholder="Ecart entre les créneaux">    
+              <button type="submit" class="btn btn-primary">Valider</button>
+            </form>   
+          <button class="btn btn-danger" @click="supprimerHoraires()">Supprimer les horaires</button>
+        </div>
         
         <div v-for="concession in concessions" :key="concession" class="section" :class="{ 'd-none': section !== concession }">
             <h3 class="text-center">{{ concession }}</h3>
+            <button class="btn btn-primary">Ajouter un modèle</button>
+            <div id="popover-content" style="display: none">
+              <form>
+                <div class="form-group">
+                  <label for="inputName">Nom</label>
+                  <input type="text" class="form-control" id="inputName">
+                </div>
+                <div class="form-group">
+                  <label for="inputEmail">Email</label>
+                  <input type="email" class="form-control" id="inputEmail">
+                </div>
+                <button type="submit" class="btn btn-primary">Envoyer</button>
+              </form>
+            </div>
         </div>
 
     </div>

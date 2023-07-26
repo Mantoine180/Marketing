@@ -6,13 +6,25 @@ const appDeroulante = Vue.createApp({
       horaires:[],
       concessions: [],
       section: '',
-      concessionInput: ''
+      concessionInput: '',
+
+      morningStart: '', // Propriété pour stocker la valeur de l'heure de début du matin
+      pauseTime: '', // Propriété pour stocker la valeur de l'heure de la pause
+      afternoonStart: '', // Propriété pour stocker la valeur de l'heure de début de l'après-midi
+      afternoonEnd: '', // Propriété pour stocker la valeur de l'heure de fin de l'après-midi
+      ecartCreneaux: null, 
     };
   },
   methods: {
     changeSection(newSection) {
       this.section = newSection;
     },
+
+    /**************************************************************************************
+    * 
+    * Chercher une concession dans la base de données
+    * 
+    ***************************************************************************************/
     async fetchConcessions() {
       try {
         const response = await fetch('http://localhost:3000/api/concession');
@@ -22,10 +34,20 @@ const appDeroulante = Vue.createApp({
         console.error('Error fetching concessions:', error);
       }
     },
+    /***************************************************************************************
+    **************************************************************************************** 
+    ****************************************************************************************/
+
+
+
+    /**************************************************************************************
+    * 
+    * Ajouter une concession
+    * 
+    ***************************************************************************************/
     async ajouterConcession() {
       const nouvelleConcession = this.concessionInput.trim();
-
-  // Vérifiez si nouvelleConcession n'est pas vide avant de l'envoyer au serveur
+    // Vérifiez si nouvelleConcession n'est pas vide avant de l'envoyer au serveur
       if (nouvelleConcession !== '' && !this.concessions.includes(nouvelleConcession)) {
         this.concessions.push(nouvelleConcession);
         try {
@@ -43,15 +65,110 @@ const appDeroulante = Vue.createApp({
         }
       }
     },
-    supprimerConcession(concession){
+    /***************************************************************************************
+    **************************************************************************************** 
+    ***************************************************************************************/
+
+    /**************************************************************************************
+    * 
+    * Supprimer une concession
+    * 
+    ***************************************************************************************/
+    async supprimerConcession(concession) {
       const index = this.concessions.indexOf(concession);
       if (index !== -1) {
-        this.concessions.splice(index, 1);
+        try {
+          const response = await fetch(`http://localhost:3000/api/concession/${encodeURIComponent(concession)}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          if (response.ok) {
+            this.concessions.splice(index, 1);
+            console.log('Concession deleted successfully');
+          } else {
+            console.error('Error deleting the concession:', response.statusText);
+          }
+        } catch (error) {
+          console.error('Error deleting the concession:', error);
+        }
+      }
+    }, 
+    /***************************************************************************************
+    **************************************************************************************** 
+    ****************************************************************************************/
+
+    /**************************************************************************************
+    * 
+    * Supprimer toute les concessions
+    * 
+    ***************************************************************************************/
+    async supprimerConcessions(){
+      this.concessions=[];
+      try {
+        const response = await fetch('http://localhost:3000/api/concession', {method: 'DELETE'});
+        const data = await response.json();
+      } catch (error) {
+        console.error('Error deleting concessions:', error);
       }
     },
-    supprimerConcessions(){
-      this.concessions=[];
-    }
+    /***************************************************************************************
+    **************************************************************************************** 
+    ***************************************************************************************/
+    
+    ajouterHoraires() {
+      // Utilisez les valeurs des propriétés pour appeler votre fonction ajouterHoraires()
+      const values = {
+        morningStart: this.morningStart,
+        pauseTime: this.pauseTime,
+        afternoonStart: this.afternoonStart,
+        afternoonEnd: this.afternoonEnd,
+        ecartCreneaux: this.ecartCreneaux,
+      };
+
+      // Appelez votre fonction ajouterHoraires() avec les valeurs récupérées
+      // Ici, vous pouvez envoyer les données au serveur ou effectuer toute autre action requise
+      console.log(values);
+      
+      let morningStartObj =new Date(`2000-01-01T${values.morningStart}:00`);
+      let morningPauseObj =new Date(`2000-01-01T${values.pauseTime}:00`);
+      let afternoonStartObj =new Date(`2000-01-01T${values.afternoonStart}:00`);
+      let afternoonEndObj=new Date(`2000-01-01T${values.afternoonEnd}:00`);
+
+
+      this.horaires = [];
+      // Boucle pour créer les créneaux horaires
+      this.ajoutertableau(morningStartObj,morningPauseObj,values.ecartCreneaux);
+      this.ajoutertableau(afternoonStartObj,afternoonEndObj,values.ecartCreneaux);
+
+      for (let i = 0; i < this.horaires.length; i++) {
+            console.log(this.horaires[i]);
+          }
+     // Affiche le premier élément du tableau
+
+    },
+    ajoutertableau(debut,fin,ecartCreneaux){
+      while (debut < fin) {
+        const heureDebutCreneau = debut.toTimeString().slice(0, 5); // Heure de début du créneau
+        debut.setMinutes(debut.getMinutes() +ecartCreneaux); // Incrémenter de l'écart créneaux pour le prochain créneau
+        const heureFinCreneau = debut.toTimeString().slice(0, 5); // Heure de fin du créneau
+
+        // Ajouter le créneau horaire au tableau
+        if(debut<=fin)
+        {
+          this.horaires.push({
+            heureDebut: heureDebutCreneau,
+            heureFin: heureFinCreneau,
+          });
+        }
+      }
+    },
+    /**************************************************************************************
+    * 
+    * Ajouter les horraires
+    * 
+    ***************************************************************************************/
   },
   mounted(){
     this.fetchConcessions();
