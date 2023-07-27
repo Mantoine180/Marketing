@@ -44,5 +44,16 @@ horaires.get('/', async (req, res) => {
     }
   });
 
+  horaires.delete('/', async (req, res) => {
+    try {
+      await CreneauHoraire.destroy({ where: {} });
+      res.status(200).json({ message: 'Horaires deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting horaires:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+  
+
 module.exports = horaires;
 

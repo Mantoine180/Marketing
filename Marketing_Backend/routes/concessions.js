@@ -15,7 +15,7 @@ concessions.get('/', async (req, res) => {
 
     res.json(nomsConcessions);
   } catch (error) {
-    console.error('Error fetching concessions:', error);
+    console.error('Error fetching horaires:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

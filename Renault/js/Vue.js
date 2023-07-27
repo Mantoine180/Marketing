@@ -39,13 +39,17 @@ const appDeroulante = Vue.createApp({
     ****************************************************************************************/
     async fetchHoraires() {
       try {
-        const response = await fetch('http://localhost:3000//api/horaires');
+        const response = await fetch('http://localhost:3000/api/horaires');
         const data = await response.json();
+    
+        // Aucune conversion nécessaire car les horaires sont déjà au format 'hh:mm'
         this.horaires = data;
       } catch (error) {
         console.error('Error fetching concessions:', error);
       }
     },
+    
+    
     /**************************************************************************************
     * 
     * Ajouter une concession
@@ -123,6 +127,12 @@ const appDeroulante = Vue.createApp({
     **************************************************************************************** 
     ***************************************************************************************/
     
+    
+    /**************************************************************************************
+    * 
+    * Ajouter les horraires
+    * 
+    ***************************************************************************************/
     ajouterHoraires() {
       // Utilisez les valeurs des propriétés pour appeler votre fonction ajouterHoraires()
       const values = {
@@ -132,45 +142,59 @@ const appDeroulante = Vue.createApp({
         afternoonEnd: this.afternoonEnd,
         ecartCreneaux: this.ecartCreneaux,
       };
-
+    
       // Appelez votre fonction ajouterHoraires() avec les valeurs récupérées
       // Ici, vous pouvez envoyer les données au serveur ou effectuer toute autre action requise
       console.log(values);
-      
-      let morningStartObj =new Date(`2000-01-01T${values.morningStart}:00`);
-      let morningPauseObj =new Date(`2000-01-01T${values.pauseTime}:00`);
-      let afternoonStartObj =new Date(`2000-01-01T${values.afternoonStart}:00`);
-      let afternoonEndObj=new Date(`2000-01-01T${values.afternoonEnd}:00`);
-
-
-      this.horaires = [];
+    
+      // Créez un tableau pour stocker les horaires sous forme d'objets avec les propriétés "heureDebut" et "heureFin"
+      const horairesData = [];
+    
+      let morningStartObj = new Date(`2000-01-01T${values.morningStart}:00`);
+      let morningPauseObj = new Date(`2000-01-01T${values.pauseTime}:00`);
+      let afternoonStartObj = new Date(`2000-01-01T${values.afternoonStart}:00`);
+      let afternoonEndObj = new Date(`2000-01-01T${values.afternoonEnd}:00`);
+    
       // Boucle pour créer les créneaux horaires
-      this.ajoutertableau(morningStartObj,morningPauseObj,values.ecartCreneaux);
-      this.ajoutertableau(afternoonStartObj,afternoonEndObj,values.ecartCreneaux);
-
+      this.ajoutertableau(morningStartObj, morningPauseObj, values.ecartCreneaux);
+      this.ajoutertableau(afternoonStartObj, afternoonEndObj, values.ecartCreneaux);
+    
       for (let i = 0; i < this.horaires.length; i++) {
-            console.log(this.horaires[i]);
+        const [heureDebut, heureFin] = this.horaires[i].split(' - ');
+        // Vérifier que les horaires ne sont pas vides et ne contiennent pas d'espaces avant de les ajouter au tableau horairesData
+        if (heureDebut && heureFin && heureDebut.trim() !== '' && heureFin.trim() !== '') {
+          horairesData.push({
+            heureDebut: heureDebut.trim(),
+            heureFin: heureFin.trim(),
+          });
+        }
+      }
+    
+      // Effectuer la requête POST vers le serveur
+      fetch('http://localhost:3000/api/horaires', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ horaires: horairesData })
+      })
+        .then(response => {
+          if (!response.ok) {
+            return response.text().then(text => {
+              throw new Error(text);
+            });
           }
-     // Affiche le premier élément du tableau
-     const horairesData = this.horaires; // Tableau des horaires à envoyer au serveur
+          return response.json();
+        })
+        .then(data => {
+          // Traitement de la réponse du serveur si nécessaire
+          console.log(data);
+        })
+        .catch(error => {
+          console.error('Error sending horaires:', error);
+        });
+    },    
 
-     // Effectuer la requête POST vers le serveur
-     fetch('http://localhost:3000/api/horaires', {
-       method: 'POST',
-       headers: {
-         'Content-Type': 'application/json'
-       },
-       body: JSON.stringify({ horaires: horairesData })
-     })
-       .then(response => response.json())
-       .then(data => {
-         // Traitement de la réponse du serveur si nécessaire
-         console.log(data);
-       })
-       .catch(error => {
-         console.error('Error sending horaires:', error);
-       });      
-    },
     ajoutertableau(debut,fin,ecartCreneaux){
       while (debut < fin) {
         const heureDebutCreneau = debut.toTimeString().slice(0, 5); // Heure de début du créneau
@@ -184,11 +208,22 @@ const appDeroulante = Vue.createApp({
         }
       }
     },
-    /**************************************************************************************
-    * 
-    * Ajouter les horraires
-    * 
-    ***************************************************************************************/
+
+    async supprimerHoraires() {
+      this.horaires = [];
+      try {
+        const response = await fetch('http://localhost:3000/api/horaires', { method: 'DELETE' });
+        if (!response.ok) {
+          const errorMessage = await response.text();
+          throw new Error(errorMessage);
+        }
+        const data = await response.json();
+        console.log(data.message); // Afficher le message de succès du serveur
+      } catch (error) {
+        console.error('Error deleting horaires:', error);
+      }
+    }
+    
   },
   mounted(){
     this.fetchConcessions();

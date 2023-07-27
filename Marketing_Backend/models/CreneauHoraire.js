@@ -3,11 +3,11 @@ const { DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
   const CreneauHoraire = sequelize.define('CreneauHoraire', {
     heureDebut: {
-      type: DataTypes.DATE,
+      type: DataTypes.TIME,
       allowNull: false
     },
     heureFin: {
-      type: DataTypes.DATE,
+      type: DataTypes.TIME,
       allowNull: false
     }
   });
