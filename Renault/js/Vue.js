@@ -42,14 +42,19 @@ const appDeroulante = Vue.createApp({
         const response = await fetch('http://localhost:3000/api/horaires');
         const data = await response.json();
     
-        // Aucune conversion nécessaire car les horaires sont déjà au format 'hh:mm'
-        this.horaires = data;
+        // Formater les horaires au format "hh:mm"
+        const formattedHoraires = data.map(horaire => {
+          const heureDebut = horaire.heureDebut; // Garder les 5 premiers caractères (hh:mm)
+          const heureFin = horaire.heureFin; // Garder les 5 premiers caractères (hh:mm)
+          return `${heureDebut} - ${heureFin}`;
+        });
+    
+        this.horaires = formattedHoraires;
       } catch (error) {
         console.error('Error fetching concessions:', error);
       }
-    },
-    
-    
+    },    
+
     /**************************************************************************************
     * 
     * Ajouter une concession
