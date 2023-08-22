@@ -5923,7 +5923,7 @@ a.close.disabled {
   border-radius: 0.25rem;
 }
 
-.popover {
+/*.popover {
   position: absolute;
   top: 0;
   left: 0;
@@ -6084,7 +6084,7 @@ a.close.disabled {
   padding: 0.5rem 0.75rem;
   color: #686A6F;
 }
-
+*/
 .carousel {
   position: relative;
 }

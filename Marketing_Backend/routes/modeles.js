@@ -1,31 +1,53 @@
 const express = require('express');
 const modeles = express.Router();
-const { Concession } = require('../db'); // Importer l'instance Sequelize
+const { ModeleAutomobile,Concession } = require('../db'); // Importer l'instance Sequelize
 
 
-modeles.get('/', async (req, res) => {
+/*modele.get('/', async (req, res) => {
   try {
-    const concessions = await Concession.findAll({
+    const modele = await ModeleAutomobile.findAll({
       raw: true, // Récupérer les données brutes (JSON) sans le nom de la table
       attributes: ['nomConcession'], // Inclure uniquement le champ nomConcession dans la réponse
     });
 
     // Extraire uniquement les noms de concession à partir des résultats
-    const nomsConcessions = concessions.map(concession => concession.nomConcession);
+    const nomsmodeles = modele.map(concession => concession.nomConcession);
 
-    res.json(nomsConcessions);
+    res.json(nomsmodeles);
   } catch (error) {
     console.error('Error fetching horaires:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
+});*/
+
+modeles.get('/:concession', async (req, res) => {
+  const { concession } = req.params;
+
+  try {
+    // Recherchez l'ID de la concession en utilisant son nom
+    const foundConcession = await Concession.findOne({
+      where: {
+        nomConcession: concession
+      }
+    });
+
+    if (foundConcession) {
+      console.log('Concession trouvée :', foundConcession.id); // Affiche l'ID de la concession trouvée
+      res.status(200).json({ id: foundConcession.id });
+    } else {
+      console.log('Concession non trouvée');
+      res.status(404).json({ message: 'Concession not found' });
+    }
+  } catch (error) {
+    console.error('Erreur serveur :', error);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
 modeles.post('/', async (req, res) => {
-  const data = req.body;
 
-  const concessionCreated = await Concession.create(data);
-  res.json(concessionCreated);
 });
+
 
 modeles.delete('/', async (req, res) => {
   try {
@@ -35,9 +57,9 @@ modeles.delete('/', async (req, res) => {
       truncate: true
     });
 
-    res.json({ message: 'All concessions deleted successfully' });
+    res.json({ message: 'All marque deleted successfully' });
   } catch (error) {
-    console.error('Error deleting concessions:', error);
+    console.error('Error deleting marque:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

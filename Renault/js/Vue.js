@@ -13,12 +13,25 @@ const appDeroulante = Vue.createApp({
       afternoonStart: '', // Propriété pour stocker la valeur de l'heure de début de l'après-midi
       afternoonEnd: '', // Propriété pour stocker la valeur de l'heure de fin de l'après-midi
       ecartCreneaux: null, 
+
+      openPopovers: {} ,
+      modeleInput: '',
+      placesInput:'',
     };
   },
   methods: {
-    changeSection(newSection) {
-      this.section = newSection;
+
+    togglePopover(concession) {
+      // Inversez l'état d'ouverture du popover pour la concession donnée
+      this.openPopovers[concession] = !this.openPopovers[concession];
     },
+    isPopoverOpen(concession) {
+      // Renvoie true si le popover est ouvert pour la concession donnée
+      return this.openPopovers[concession];
+    },
+  
+
+
 
     /**************************************************************************************
     * 
@@ -55,6 +68,22 @@ const appDeroulante = Vue.createApp({
       }
     },    
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /**************************************************************************************
     * 
     * Ajouter une concession
@@ -83,7 +112,6 @@ const appDeroulante = Vue.createApp({
     /***************************************************************************************
     **************************************************************************************** 
     ***************************************************************************************/
-
     /**************************************************************************************
     * 
     * Supprimer une concession
@@ -133,6 +161,21 @@ const appDeroulante = Vue.createApp({
     ***************************************************************************************/
     
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /**************************************************************************************
     * 
     * Ajouter les horraires
@@ -227,8 +270,84 @@ const appDeroulante = Vue.createApp({
       } catch (error) {
         console.error('Error deleting horaires:', error);
       }
+    },
+    /***************************************************************************************
+    **************************************************************************************** 
+    ***************************************************************************************/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /**************************************************************************************
+    * 
+    * Ajouter les modeles
+    * 
+    ***************************************************************************************/
+// Dans votre code Vue.js
+  async ajouterAutomobile(concession){
+  console.log('Entrée dans le programme');
+  const nouveauModele = this.modeleInput.trim();
+  const nbPlaces = parseInt(this.placesInput); // Convertir en nombre entier
+
+  // Vérifiez si nouveauModele n'est pas vide et nbPlaces est un nombre valide
+  if (nouveauModele !== '' && !isNaN(nbPlaces) && nbPlaces >= 0) {
+    try {
+      // Recherchez l'ID de la concession en utilisant son nom
+      const responseConcession = await fetch(`http://localhost:3000/api/modeles/${encodeURIComponent(concession)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+console.log(responseConcession);
+      if (responseConcession.ok) {
+        const concessions = await responseConcession.json();
+        const foundConcession = concessions.find(c => c.nomConcession === concession);
+
+        if (foundConcession) {
+          // Insérez le nouveau modèle avec l'ID de la concession trouvée
+          const responseModele = await fetch('http://localhost:3000/api/modeles', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ modèle: nouveauModele, concessionId: foundConcession.id })
+          });
+
+          if (responseModele.ok) {
+            // Le modèle a été inséré avec succès
+          } else {
+            console.error('Error adding model:', responseModele.status);
+          }
+        } else {
+          console.error('Concession not found:', concession);
+        }
+      } else {
+        console.error('Error fetching concessions:', responseConcession.status);
+      }
+    }catch (error) {
+      console.error('Error adding model:', error);
     }
-    
+  }
+}
+
+
   },
   mounted(){
     this.fetchConcessions();
@@ -360,7 +479,6 @@ const app = Vue.createApp({
   }
 });
 app.mount('#background-color');
-
 
 
 
