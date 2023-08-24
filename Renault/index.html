@@ -22,8 +22,6 @@
       <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
       <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-
-      
 </head>
 
 <body>
@@ -38,9 +36,6 @@
                 <input type="text" class="form-control form-control-sm col-md-3 mb-3" v-model="titre" @input="sauvegardeTitre">
                 <input type="checkbox" id="blankCheckbox" value="option1" aria-label="...">
             </div>
-            <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
-                <span class="navbar-toggler-icon"></span>
-            </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav ml-auto">
                 <div class="d-none d-xl-flex align-items-center pl-4"> 
@@ -49,11 +44,11 @@
             </ul>
             </div>
         </nav>
-        </div>    <!-- Navbar End -->
+      </div>    <!-- Navbar End -->
 
 
     <!-- Header Start -->
-    <div id="background-color">
+    <header id="background-color">
         <div class="container-fluid py-5 px-0 " style="margin-bottom: 45px;" :style="{ backgroundColor: backgroundColor }">
             <button id="colorPicker"></button>
             <div class="row mx-0 align-items-center">
@@ -82,9 +77,8 @@
                     </div>
                 </div>   
             </div>
-        </div>
-    </div>
-    
+    </header>
+
     <div id="menu_deroulant_container">
         <div class="d-flex justify-content-center">
           <select class="form-select form-select-lg w-75 drop_list" v-model="section" aria-label="Default select example">
@@ -193,7 +187,7 @@
 
 
    
-    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.8.0/dist/pickr.min.js"></script>-
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr@1.8.0/dist/pickr.min.js"></script>
     <script src="https://unpkg.com/vue@next"></script>
     <script src="js/Vue.js"></script>
 

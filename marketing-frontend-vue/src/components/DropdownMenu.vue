@@ -1,7 +1,109 @@
+<template>
+ <div id="menu_deroulant_container">
+        <div class="d-flex justify-content-center">
+          <select class="form-select form-select-lg w-75 drop_list" v-model="section" aria-label="Default select example">
+            <option value="" class="text-center">Choisir la concession</option>
+            <option value="section1" class="text-center">Ajouter/Suprimer une concession</option>
+            <option value="section2" class="text-center">Changer les horaires d'exposition</option>
+            <option v-for="concession in concessions" :value="concession" class="text-center" :key="concession.id">{{ concession }}</option>
+          </select>
+        </div>
+      
+        <div class="section" v-if="section === 'section1'">
 
-const appDeroulante = Vue.createApp({
+          <form @submit.prevent="ajouterConcession">
+            <div class="form-group">
+              <div class="input-group">
+                <input type="text" class="form-control" id="formGroupExampleInput" v-model="concessionInput" placeholder="Nom de la concession">
+                <button type="submit" class="btn btn-primary">Ajouter une concession</button>
+              </div>
+            </div>
+          </form>
+
+          <div v-for="concession in concessions" :key="concession" class="section">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="text-center">{{ concession }}</h3>
+                <button class="btn btn-danger" @click="supprimerConcession(concession)">Supprimer cette concession</button>
+            </div>
+          </div>
+
+          <button @click="supprimerConcessions" type="submit" class="btn btn-danger btn-lg btn-block">Supprimer les concessions</button>
+
+        </div>
+
+        <div class="section" v-if="section === 'section2'">
+            <form @submit.prevent="ajouterHoraires">
+              <input type="time" v-model="morningStart" min="08:00" max="11:00" required>
+              <small>Choisir l'heure de début du matin</small><br>
+          
+              <input type="time" v-model="pauseTime" min="11:30" max="14:00" required>
+              <small>Choisir l'heure de la pause</small><br>
+          
+              <input type="time" v-model="afternoonStart" min="13:00" max="17:00" required>
+              <small>Choisir l'heure de début de l'après-midi</small><br>
+          
+              <input type="time" v-model="afternoonEnd" min="17:30" max="19:00" required>
+              <small>Choisir l'heure de fin de l'après-midi</small><br>
+          
+              <input type="number" class="form-control" v-model="ecartCreneaux" placeholder="Ecart entre les créneaux">    
+              <button type="submit" class="btn btn-primary">Valider</button>
+            </form>   
+            <div v-for="horaire in horaires" :key="horaire">
+              <h3 class="text-center">{{horaire}}</h3>
+            </div>  
+          <button class="btn btn-danger" @click="supprimerHoraires">Supprimer les horaires</button>
+        </div>
+        
+        <div v-for="concession in concessions" :key="concession" class="section" :class="{ 'd-none': section !== concession }">
+            <div class="container">
+              <div class="row justify-content-center align-items-center">
+                <div class="col text-center">
+                  <h3 class="nom_concession">{{ concession }}</h3>
+                </div>
+                <div class="col text-right">
+                  <!-- Utilisez une classe unique pour le bouton de déclenchement -->
+                  <button :class="'btn btn-primary popover-trigger ' + concession" @click="togglePopover(concession)">Ajouter un modèle</button>
+                </div>
+              </div>
+            </div>
+            <!-- Utilisez la directive v-if pour afficher le formulaire si le popover est ouvert -->
+            <div v-if="isPopoverOpen(concession)" class="popover-content" :class="'popover-content ' + concession">
+              <form @submit.prevent="ajouterAutomobile(concession)">
+                <div class="form-group">
+                  <label :for="'autoName-' + concession">Nom du modèle</label>
+                  <input v-model="modeleInput" type="text" class="form-control" :id="'autoName-' + concession">
+                </div>
+                <div class="form-group">
+                  <label :for="'inputEmail-' + concession">Places disponibles</label>
+                  <input type="number" min="1" class="form-control" :id="'inputEmail-' + concession" v-model="placesInput">
+                </div>
+                <button type="submit" class="btn btn-primary">Créer modèle</button>
+              </form>
+            </div>
+        </div>
+    </div>   
+    <!-- Footer Start -->
+	    <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-md-5" style="margin-top: 90px;">
+        <div class="row pt-5">
+            <div class="col-lg-3 col-md-6 mb-5">
+                <a href="index-2.html" class="navbar-brand">
+                    <h1 class="m-0 mt-n2 text-white display-5">Groupe PEYROT</h1>
+                </a>
+                <p><br></p>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">
+            </div>
+            <div class="col-lg-3 col-md-6 mb-5">          
+            </div>
+        </div>
+    </div>
+  </template>
   
-  data() {
+  <script>
+  export default {
+    data() {
     return {
       horaires:[],
       concessions: [],
@@ -353,133 +455,6 @@ console.log(responseConcession);
     this.fetchConcessions();
     this.fetchHoraires();
   },
-});
-
-appDeroulante.mount('#menu_deroulant_container');
-
-// Fonction qui permet d'initialiser Vue.js
-
-/*****************************************
-Modification du titre principal
-******************************************/
-const header = Vue.createApp({
-  data() {
-    return {
-      titre: "Veuillez mettre la date de l'exposition"
-    };
-  },
-
-  methods: {
-    sauvegardeTitre() {
-      localStorage.setItem('messageSauvegarde', this.titre);
-    }
-  },
-
-  mounted() {
-    const messageSauvegarde = localStorage.getItem('messageSauvegarde');
-    if (messageSauvegarde) {
-      this.titre = messageSauvegarde;
-    }
-  }
-});
-header.mount('#titre-principal');
-
-/****************************************
- Modification de la zone 
-*****************************************/
-const app = Vue.createApp({
-  data() {
-    return {
-      backgroundColor: localStorage.getItem('backgroundColor') || '#FFFFFF',
-      imagePath: 'P:\RSI\Marketing\Site de rendez vous\Renault\img\header.png',
-      titre: "Veullez mettre le modèle",
-      description: "Voici le texte qui contiendra la description du salon ainsi que des modèles automobiles mis en vente"
-    };
-  },
-
-  methods: {
-    sauvegardeTitre() {
-      localStorage.setItem('messageModele', this.titre);
-    },
-    sauvegardeDescription() {
-      localStorage.setItem('description-texte', this.description);
-    },
-    handleImageChange(event) {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-
-      reader.onload = () => {
-        this.imagePath = reader.result;
-        localStorage.setItem('savedImage', this.imagePath);
-      };
-
-      if (file) {
-        reader.readAsDataURL(file);
-      }
-    }
-  },
-
-  created() {
-    const savedImage = localStorage.getItem('savedImage');
-    if (savedImage) {
-      this.imagePath = savedImage;
-    }
-  },
-
-  mounted() {
-    const messageSauvegarde = localStorage.getItem('messageModele');
-    if (messageSauvegarde) {
-      this.titre = messageSauvegarde;
-    }
-
-    const messageDescription = localStorage.getItem('description-texte');
-    if (messageDescription) {
-      this.description = messageDescription;
-    }
-
-    const pickr = Pickr.create({
-      el: '#colorPicker',
-      theme: 'classic',
-      default: this.backgroundColor,
-      components: {
-        preview: true,
-        opacity: true,
-        hue: true,
-        interaction: {
-          hex: true,
-          rgba: true,
-          hsla: true,
-          hsva: true,
-          cmyk: true,
-          input: true,
-          clear: true,
-          save: true
-        }
-      }
-    });
-
-    pickr.on('save', color => {
-      this.backgroundColor = color.toHEXA().toString();
-      pickr.hide();
-    });
-
-    document.getElementById('colorPicker').addEventListener('click', () => {
-      pickr.show();
-    });
-  },
-
-  beforeUnmount() {
-    localStorage.setItem('savedImage', this.imagePath);
-  },
-
-  watch: {
-    backgroundColor(newColor) {
-      localStorage.setItem('backgroundColor', newColor);
-    }
-  }
-});
-app.mount('#background-color');
-
-
-
-
+}
+  </script>
+  
