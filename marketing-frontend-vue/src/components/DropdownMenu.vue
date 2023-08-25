@@ -417,7 +417,7 @@
           'Content-Type': 'application/json'
         }
       });
-console.log(responseConcession);
+      console.log(responseConcession);
       if (responseConcession.ok) {
         const concessions = await responseConcession.json();
         const foundConcession = concessions.find(c => c.nomConcession === concession);
