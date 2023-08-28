@@ -301,12 +301,12 @@ const appDeroulante = Vue.createApp({
     ***************************************************************************************/
 // Dans votre code Vue.js
   async ajouterAutomobile(concession){
-  console.log('Entrée dans le programme');
   const nouveauModele = this.modeleInput.trim();
   const nbPlaces = parseInt(this.placesInput); // Convertir en nombre entier
 
   // Vérifiez si nouveauModele n'est pas vide et nbPlaces est un nombre valide
   if (nouveauModele !== '' && !isNaN(nbPlaces) && nbPlaces >= 0) {
+    
     try {
       // Recherchez l'ID de la concession en utilisant son nom
       const responseConcession = await fetch(`http://localhost:3000/api/modeles/${encodeURIComponent(concession)}`, {
@@ -315,35 +315,34 @@ const appDeroulante = Vue.createApp({
           'Content-Type': 'application/json'
         }
       });
-console.log(responseConcession);
-      if (responseConcession.ok) {
-        const concessions = await responseConcession.json();
-        const foundConcession = concessions.find(c => c.nomConcession === concession);
-
-        if (foundConcession) {
-          // Insérez le nouveau modèle avec l'ID de la concession trouvée
-          const responseModele = await fetch('http://localhost:3000/api/modeles', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ modèle: nouveauModele, concessionId: foundConcession.id })
-          });
-
-          if (responseModele.ok) {
-            // Le modèle a été inséré avec succès
-          } else {
-            console.error('Error adding model:', responseModele.status);
-          }
-        } else {
-          console.error('Concession not found:', concession);
-        }
-      } else {
-        console.error('Error fetching concessions:', responseConcession.status);
+  
+      if (!responseConcession.ok) {
+          throw new Error('Error fetching concessions');
       }
-    }catch (error) {
-      console.error('Error adding model:', error);
-    }
+  
+      const concessions_id = await responseConcession.text(); // Notez que nous utilisons .text() car la réponse est une chaîne (ID converti en chaîne).
+      console.log(concessions_id);
+  
+      // Insérez le nouveau modèle avec l'ID de la concession trouvée
+      const responseModele = await fetch('http://localhost:3000/api/modeles', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ modele: nouveauModele, concessionId: concessions_id }) // Notez l'utilisation de concessions_id ici
+      });
+  
+      if (!responseModele.ok) {
+        throw new Error('Error adding model');
+      }
+  
+      // Le modèle a été inséré avec succès
+      console.log('Model added successfully!');
+  
+  } catch (error) {
+      console.error('Error:', error);
+  }
+  
   }
 }
 
@@ -358,7 +357,6 @@ console.log(responseConcession);
 appDeroulante.mount('#menu_deroulant_container');
 
 // Fonction qui permet d'initialiser Vue.js
-
 /*****************************************
 Modification du titre principal
 ******************************************/
