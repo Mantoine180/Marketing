@@ -2,6 +2,7 @@ const express = require('express');
 const concessions = require('./routes/concessions'); // Assurez-vous que le chemin d'accès est correct
 const horaires=require('./routes/horaires');
 const modeles=require('./routes/modeles'); 
+const reservation=require('./routes/reservation'); 
 const { sequelize } = require('./db'); // Importer l'instance Sequelize
 const cors = require('cors');
 
@@ -12,8 +13,9 @@ app.use(express.json()); // Middleware pour parser les requêtes JSON
 app.use(cors());// Active les en-têtes CORS pour toutes les routes
 
 app.use('/api/concession', concessions); // Utiliser les routes définies dans routes.js
-app.use('/api/horaires', horaires); //Utiliser les routes définies dans routes.js
+app.use('/api/horaires', horaires);
 app.use('/api/modeles', modeles);
+app.use('/api/reservation', reservation);
 sequelize.authenticate()
   .then(() => {
     console.log('Connection to the database has been established successfully.');

@@ -4,6 +4,7 @@ const appDeroulante = Vue.createApp({
   data() {
     return {
       horaires:[],
+      horaires_id:[],
       concessions: [],
       section: '',
       concessionInput: '',
@@ -13,6 +14,7 @@ const appDeroulante = Vue.createApp({
       afternoonStart: '', // Propriété pour stocker la valeur de l'heure de début de l'après-midi
       afternoonEnd: '', // Propriété pour stocker la valeur de l'heure de fin de l'après-midi
       ecartCreneaux: null, 
+      id_horaires:null,
 
       openPopovers: {} ,
       modeleInput: '',
@@ -57,24 +59,28 @@ const appDeroulante = Vue.createApp({
     
         // Formater les horaires au format "hh:mm"
         const formattedHoraires = data.map(horaire => {
-          const heureDebut = horaire.heureDebut; // Garder les 5 premiers caractères (hh:mm)
-          const heureFin = horaire.heureFin; // Garder les 5 premiers caractères (hh:mm)
+          const heureDebut = horaire.heureDebut;
+          const heureFin = horaire.heureFin;
           return `${heureDebut} - ${heureFin}`;
         });
-    
         this.horaires = formattedHoraires;
       } catch (error) {
         console.error('Error fetching concessions:', error);
       }
-    },    
+    },
 
-
-
-
-
-
-
-
+    async fetchHorairesId() {
+      try {
+        const response = await fetch('http://localhost:3000/api/horaires');
+        const data = await response.json();
+    
+        // Extraire les ids et les stocker dans le tableau horaires_id
+        const horaires_id = data.map(horaire => horaire.id);
+        this.horaires_id = horaires_id; // Assurez-vous que vous avez défini horaires_id dans la section data de votre composant
+      } catch (error) {
+        console.error('Error fetching id:', error);
+      }
+    },
 
 
 
@@ -241,6 +247,8 @@ const appDeroulante = Vue.createApp({
         .catch(error => {
           console.error('Error sending horaires:', error);
         });
+
+        fetchHorairesId();
     },    
 
     ajoutertableau(debut,fin,ecartCreneaux){
@@ -259,6 +267,7 @@ const appDeroulante = Vue.createApp({
 
     async supprimerHoraires() {
       this.horaires = [];
+      this.horaires_id=[];
       try {
         const response = await fetch('http://localhost:3000/api/horaires', { method: 'DELETE' });
         if (!response.ok) {
@@ -321,24 +330,35 @@ const appDeroulante = Vue.createApp({
       }
   
       const concessions_id = await responseConcession.text(); // Notez que nous utilisons .text() car la réponse est une chaîne (ID converti en chaîne).
-      console.log(concessions_id);
+      //console.log(concessions_id);
   
       // Insérez le nouveau modèle avec l'ID de la concession trouvée
-      const responseModele = await fetch('http://localhost:3000/api/modeles', {
-        method: 'POST',
+      const responseModele = await fetch(`http://localhost:3000/api/modeles/${encodeURIComponent(concessions_id)}/${encodeURIComponent(nouveauModele)}`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ modele: nouveauModele, concessionId: concessions_id }) // Notez l'utilisation de concessions_id ici
+        }
       });
-  
+
       if (!responseModele.ok) {
         throw new Error('Error adding model');
       }
-  
+      const modeles_id = await responseModele.text(); // Notez que nous utilisons .text() car la réponse est une chaîne (ID converti en chaîne).
+      console.log(modeles_id);
       // Le modèle a été inséré avec succès
       console.log('Model added successfully!');
-  
+
+
+
+      // Ajouter les réservations.
+
+      // Rechercher l'ID du modèle Automobile avec Id de la concession et l'ID du modèle automobile 
+      const responseIdModele = await fetch(`http://localhost:3000/api/modeles}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
   } catch (error) {
       console.error('Error:', error);
   }

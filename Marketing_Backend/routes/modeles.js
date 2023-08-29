@@ -2,24 +2,6 @@ const express = require('express');
 const modeles = express.Router();
 const { ModeleAutomobile,Concession } = require('../db'); // Importer l'instance Sequelize
 
-
-/*modele.get('/', async (req, res) => {
-  try {
-    const modele = await ModeleAutomobile.findAll({
-      raw: true, // Récupérer les données brutes (JSON) sans le nom de la table
-      attributes: ['nomConcession'], // Inclure uniquement le champ nomConcession dans la réponse
-    });
-
-    // Extraire uniquement les noms de concession à partir des résultats
-    const nomsmodeles = modele.map(concession => concession.nomConcession);
-
-    res.json(nomsmodeles);
-  } catch (error) {
-    console.error('Error fetching horaires:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});*/
-
 modeles.get('/:concession', async (req, res) => {
   const { concession } = req.params;
 
