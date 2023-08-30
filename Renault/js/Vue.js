@@ -264,7 +264,6 @@ const appDeroulante = Vue.createApp({
         }
       }
     },
-
     async supprimerHoraires() {
       this.horaires = [];
       this.horaires_id=[];
@@ -332,36 +331,41 @@ const appDeroulante = Vue.createApp({
       const concessions_id = await responseConcession.text(); // Notez que nous utilisons .text() car la réponse est une chaîne (ID converti en chaîne).
       //console.log(concessions_id);
   
-      // Insérez le nouveau modèle avec l'ID de la concession trouvée
-      const responseModele = await fetch(`http://localhost:3000/api/modeles/${encodeURIComponent(concessions_id)}/${encodeURIComponent(nouveauModele)}`, {
-        method: 'GET',
+      const responseModele = await fetch('http://localhost:3000/api/modeles', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({ modele: nouveauModele, concessionId: concessions_id }) // Notez l'utilisation de concessions_id ici
       });
-
+  
       if (!responseModele.ok) {
         throw new Error('Error adding model');
       }
-      const modeles_id = await responseModele.text(); // Notez que nous utilisons .text() car la réponse est une chaîne (ID converti en chaîne).
-      console.log(modeles_id);
+  
       // Le modèle a été inséré avec succès
       console.log('Model added successfully!');
 
 
-
-      // Ajouter les réservations.
-
-      // Rechercher l'ID du modèle Automobile avec Id de la concession et l'ID du modèle automobile 
-      const responseIdModele = await fetch(`http://localhost:3000/api/modeles}`, {
+      // Insérez le nouveau modèle avec l'ID de la concession trouvée
+      const responseModeleID = await fetch(`http://localhost:3000/api/modeles/${encodeURIComponent(concessions_id)}/${encodeURIComponent(nouveauModele)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
         }
       });
-  } catch (error) {
-      console.error('Error:', error);
-  }
+
+      if (!responseModeleID.ok) {
+        throw new Error('Error adding model');
+      }
+      const modeles_id = await responseModeleID.text(); // Notez que nous utilisons .text() car la réponse est une chaîne (ID converti en chaîne).
+      
+      console.log(modeles_id);
+      // Le modèle a été inséré avec succès
+      console.log('Model added successfully!');
+      } catch (error) {
+          console.error('Error:', error);
+      }
   
   }
 }
@@ -446,7 +450,7 @@ const app = Vue.createApp({
 
   mounted() {
     const messageSauvegarde = localStorage.getItem('messageModele');
-    if (messageSauvegarde) {
+    if (messageSauvegarde) {   
       this.titre = messageSauvegarde;
     }
 
@@ -497,7 +501,3 @@ const app = Vue.createApp({
   }
 });
 app.mount('#background-color');
-
-
-
-

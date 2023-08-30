@@ -38,52 +38,15 @@ modeles.post('/', async (req, res) => {
 
     // Insérez le nouveau modèle
     const newModel = await ModeleAutomobile.create({ modele: modele, concessionId: concessionId });
-
+    console.log(newModel);
     // Répondez avec succès
     res.status(201).json(newModel);
-
+    
   } catch (error) {
     console.error("Erreur lors de l'insertion du modèle:", error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 });
 
-
-
-modeles.delete('/', async (req, res) => {
-  try {
-    // Effacer toutes les données de la table Concession
-    await Concession.destroy({
-      where: {},
-      truncate: true
-    });
-
-    res.json({ message: 'All marque deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting marque:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-modeles.delete('/:concession', async (req, res) => {
-  const { concession } = req.params;
-  
-  try {
-    const deletedConcession = await Concession.destroy({
-      where: {
-        nomConcession: concession
-      }
-    });
-
-    if (deletedConcession === 1) {
-      res.json({ message: 'The concession deleted successfully' });
-    } else {
-      res.status(404).json({ error: 'Concession not found' });
-    }
-  } catch (error) {
-    console.error('Error deleting concession:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
 
 module.exports = modeles;
