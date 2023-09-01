@@ -30,7 +30,6 @@ modeles.post('/', async (req, res) => {
   try {
     // Prenez les données du corps de la requête
     const { modele, concessionId } = req.body; // Utilisez "modele" sans accent
-
     // Validation
     if (!modele || !concessionId) {
       return res.status(400).json({ message: 'Modèle et concessionId sont nécessaires' });
@@ -38,7 +37,6 @@ modeles.post('/', async (req, res) => {
 
     // Insérez le nouveau modèle
     const newModel = await ModeleAutomobile.create({ modele: modele, concessionId: concessionId });
-    console.log(newModel);
     // Répondez avec succès
     res.status(201).json(newModel);
     

@@ -2,8 +2,9 @@ const express = require('express');
 const reservation = express.Router();
 const { Reservation,CreneauHoraire,ModeleAutomobile } = require('../db'); // Importer l'instance Sequelize
 
-reservation.get('/:concessionId/:modele', async (req, res) => { 
-  const { modele, concessionId } = req.params;
+reservation.get('/idconcession', async (req, res) => { 
+  const modele = req.query.modele;
+  const concessionId = req.query.concessionId;
 
   try {
     const foundModele = await ModeleAutomobile.findOne({
@@ -26,15 +27,29 @@ reservation.get('/:concessionId/:modele', async (req, res) => {
   }
 });
 
+
   
 reservation.post('/', async (req, res) => {
-    try {
+  try {
+    console.log(req.body);
+    // Prenez les données du corps de la requête
+    const { nbPlaces,crenauId,modeleId } = req.body; // Utilisez "modele" sans accent
 
-    res.status(201).json({ message: 'reservation inserted successfully' });
-    } catch (error) {
-    console.error('Error inserting reservation:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.log(typeof modeleId)
+    // Validation
+    if (!nbPlaces || !crenauId|| !modeleId) {
+      return res.status(400).json({ message: 'Modèle et concessionId sont nécessaires' });
     }
+
+    // Insérez le nouveau modèle
+    const newReservation = await Reservation.create({ quantiteReservee:0, quantiteMax:nbPlaces,modeleId:modeleId,creneauId:crenauId });
+    // Répondez avec succès
+    res.status(201).json(newReservation);
+    
+  } catch (error) {
+    console.error("Erreur lors de l'insertion des reservations:", error);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
 });
 
 reservation.delete('/', async (req, res) => {

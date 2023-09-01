@@ -248,7 +248,7 @@ const appDeroulante = Vue.createApp({
           console.error('Error sending horaires:', error);
         });
 
-        fetchHorairesId();
+        this.fetchHorairesId();
     },    
 
     ajoutertableau(debut,fin,ecartCreneaux){
@@ -317,17 +317,13 @@ const appDeroulante = Vue.createApp({
     
     try {
       // Recherchez l'ID de la concession en utilisant son nom
-      const responseConcession = await fetch(`http://localhost:3000/api/modeles/${encodeURIComponent(concession)}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-  
+      const responseConcession = await fetch(`http://localhost:3000/api/modeles/${encodeURIComponent(concession)}`);
+
       if (!responseConcession.ok) {
           throw new Error('Error fetching concessions');
       }
-  
+      
+
       const concessions_id = await responseConcession.text(); // Notez que nous utilisons .text() car la réponse est une chaîne (ID converti en chaîne).
       //console.log(concessions_id);
   
@@ -346,24 +342,32 @@ const appDeroulante = Vue.createApp({
       // Le modèle a été inséré avec succès
       console.log('Model added successfully!');
 
+      // Recherchez l'ID du modèle en utilisant son nom et l'id de la concession et prélever sa valeur
+      const params = new URLSearchParams({concessionId: concessions_id, modele: nouveauModele });
 
-      // Insérez le nouveau modèle avec l'ID de la concession trouvée
-      const responseModeleID = await fetch(`http://localhost:3000/api/modeles/${encodeURIComponent(concessions_id)}/${encodeURIComponent(nouveauModele)}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      const responseModeleID = await fetch(`http://localhost:3000/api/reservation/idconcession/?${params}`);
 
       if (!responseModeleID.ok) {
-        throw new Error('Error adding model');
+          throw new Error('Error fetching model');
       }
-      const modeles_id = await responseModeleID.text(); // Notez que nous utilisons .text() car la réponse est une chaîne (ID converti en chaîne).
-      
-      console.log(modeles_id);
-      // Le modèle a été inséré avec succès
-      console.log('Model added successfully!');
-      } catch (error) {
+  
+      const modeleData = await responseModele.json();
+      const modele_id = modeleData.id;
+      console.log('ID du modèle:', modele_id);
+
+      // Effectuer la requête POST vers le serveur pour mettre en place les réservations
+      for (let i = 0; i < this.horaires_id.length; i++) {
+        fetch('http://localhost:3000/api/reservation', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({quantiteMax: nbPlaces, crenauId: this.horaires_id[i], modeleId: modele_id})
+        })
+      }
+
+    } 
+    catch (error) {
           console.error('Error:', error);
       }
   
@@ -375,6 +379,7 @@ const appDeroulante = Vue.createApp({
   mounted(){
     this.fetchConcessions();
     this.fetchHoraires();
+    this.fetchHorairesId();
   },
 });
 
