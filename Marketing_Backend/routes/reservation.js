@@ -1,6 +1,6 @@
 const express = require('express');
 const reservation = express.Router();
-const { Reservation,CreneauHoraire,ModeleAutomobile } = require('../db'); // Importer l'instance Sequelize
+const { Reservation,ModeleAutomobile} = require('../db'); // Importer l'instance Sequelize
 
 reservation.get('/idconcession', async (req, res) => { 
   const modele = req.query.modele;
@@ -33,16 +33,14 @@ reservation.post('/', async (req, res) => {
   try {
     console.log(req.body);
     // Prenez les données du corps de la requête
-    const { nbPlaces,crenauId,modeleId } = req.body; // Utilisez "modele" sans accent
-
-    console.log(typeof modeleId)
+    const { quantiteMax,creneauId,modeleId } = req.body; // Utilisez "modele" sans accent
     // Validation
-    if (!nbPlaces || !crenauId|| !modeleId) {
+    if (!quantiteMax || !creneauId|| !modeleId) {
       return res.status(400).json({ message: 'Modèle et concessionId sont nécessaires' });
     }
 
     // Insérez le nouveau modèle
-    const newReservation = await Reservation.create({ quantiteReservee:0, quantiteMax:nbPlaces,modeleId:modeleId,creneauId:crenauId });
+    const newReservation = await Reservation.create({ quantiteReservee:0, quantiteMax:quantiteMax,modeleId:modeleId,creneauId:creneauId });
     // Répondez avec succès
     res.status(201).json(newReservation);
     

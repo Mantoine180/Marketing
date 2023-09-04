@@ -362,7 +362,7 @@ const appDeroulante = Vue.createApp({
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({quantiteMax: nbPlaces, crenauId: this.horaires_id[i], modeleId: modele_id})
+          body: JSON.stringify({quantiteMax: nbPlaces, creneauId: this.horaires_id[i], modeleId: modele_id})
         })
       }
 
@@ -403,7 +403,7 @@ const header = Vue.createApp({
   },
 
   mounted() {
-    const messageSauvegarde = localStorage.getItem('messageSauvegarde');
+    const messageSauvegarde = localStorage.getItem('messageSauvemodeleIdgarde');
     if (messageSauvegarde) {
       this.titre = messageSauvegarde;
     }
