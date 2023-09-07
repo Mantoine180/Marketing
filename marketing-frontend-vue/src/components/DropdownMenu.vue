@@ -53,21 +53,23 @@
             </div>  
           <button class="btn btn-danger" @click="supprimerHoraires">Supprimer les horaires</button>
         </div>
-        
         <div v-for="concession in concessions" :key="concession" class="section" :class="{ 'd-none': section !== concession }">
-            <div class="container">
-              <div class="row justify-content-center align-items-center">
-                <div class="col text-center">
-                  <h3 class="nom_concession">{{ concession }}</h3>
-                </div>
-                <div class="col text-right">
-                  <!-- Utilisez une classe unique pour le bouton de déclenchement -->
-                  <button :class="'btn btn-primary popover-trigger ' + concession" @click="togglePopover(concession)">Ajouter un modèle</button>
-                </div>
-              </div>
-            </div>
-            <!-- Utilisez la directive v-if pour afficher le formulaire si le popover est ouvert -->
-            <div v-if="isPopoverOpen(concession)" class="popover-content" :class="'popover-content ' + concession">
+    <div class="container">
+      <div class="row justify-content-center align-items-center">
+        <div class="col text-center">
+          <h3 class="nom_concession">{{ concession }}</h3>
+        </div>
+        <div class="col text-right">
+          <button 
+            class="btn btn-primary"
+            @click.stop="togglePopover(concession)"
+            :id="'popover-' + concession"
+          >
+            Ajouter un modèle
+          </button>
+          
+          <b-popover :target="'popover-' + concession" v-model="popovers[concession]">
+            <template #default>
               <form @submit.prevent="ajouterAutomobile(concession)">
                 <div class="form-group">
                   <label :for="'autoName-' + concession">Nom du modèle</label>
@@ -79,9 +81,13 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Créer modèle</button>
               </form>
-            </div>
+            </template>
+          </b-popover>
         </div>
-    </div>   
+      </div>
+    </div>
+  </div>
+</div>   
     <!-- Footer Start -->
 	    <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-md-5" style="margin-top: 90px;">
         <div class="row pt-5">
@@ -116,16 +122,15 @@
       afternoonEnd: '', // Propriété pour stocker la valeur de l'heure de fin de l'après-midi
       ecartCreneaux: null, 
 
-      openPopovers: {} ,
+      popovers: {},
       modeleInput: '',
-      placesInput:'',
+      placesInput: ''
     };
   },
   methods: {
 
     togglePopover(concession) {
-      // Inversez l'état d'ouverture du popover pour la concession donnée
-      this.openPopovers[concession] = !this.openPopovers[concession];
+      this.$set(this.popovers, concession, !this.popovers[concession]);
     },
     isPopoverOpen(concession) {
       // Renvoie true si le popover est ouvert pour la concession donnée
@@ -447,6 +452,7 @@
       console.error('Error adding model:', error);
     }
   }
+  this.togglePopover(concession); // Fermer le popover
 }
 
 

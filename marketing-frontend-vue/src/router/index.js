@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import AppVue from '../views/admin/PageAdmin.vue';
+import AppVue from '../views/PageAdmin.vue';
 import Login from '../views/Login.vue'; // Assurez-vous que ce chemin est correct!
 
 const router = createRouter({

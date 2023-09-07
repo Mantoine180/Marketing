@@ -29,17 +29,17 @@ const Concession = defineConcession(sequelize); // Ajoutez ceci
 const Info=defineInfo(sequelize);
 
 // Définissez les relations
-Client.belongsTo(Reservation, { as: 'reservation', foreignKey: 'reservationId' });
-Reservation.hasOne(Client, { as: 'client', foreignKey: 'reservationId' });
+Client.belongsTo(Reservation, { as: 'reservation', foreignKey: 'reservationId' ,onDelete: 'CASCADE' });
+Reservation.hasOne(Client, { as: 'client', foreignKey: 'reservationId' ,onDelete: 'CASCADE'});
 
-Reservation.belongsTo(ModeleAutomobile, { as: 'modele', foreignKey: 'modeleId' });
-ModeleAutomobile.hasMany(Reservation, { as: 'reservations', foreignKey: 'modeleId' });
+Reservation.belongsTo(ModeleAutomobile, { as: 'modele', foreignKey: 'modeleId' ,onDelete: 'CASCADE'});
+ModeleAutomobile.hasMany(Reservation, { as: 'reservations', foreignKey: 'modeleId' ,onDelete: 'CASCADE'});
 
-Reservation.belongsTo(CreneauHoraire, { as: 'creneau', foreignKey: 'creneauId' });
-CreneauHoraire.hasMany(Reservation, { as: 'reservations', foreignKey: 'creneauId' });
+Reservation.belongsTo(CreneauHoraire, { as: 'creneau', foreignKey: 'creneauId' ,onDelete: 'CASCADE'});
+CreneauHoraire.hasMany(Reservation, { as: 'reservations', foreignKey: 'creneauId' ,onDelete: 'CASCADE'});
 
-ModeleAutomobile.belongsTo(Concession, { as: 'concession', foreignKey: 'concessionId' }); // Ajoutez ceci
-Concession.hasMany(ModeleAutomobile, { as: 'modeles', foreignKey: 'concessionId' }); // Ajoutez ceci
+ModeleAutomobile.belongsTo(Concession, { as: 'concession', foreignKey: 'concessionId' ,onDelete: 'CASCADE'}); // Ajoutez ceci
+Concession.hasMany(ModeleAutomobile, { as: 'modeles', foreignKey: 'concessionId' ,onDelete: 'CASCADE'}); // Ajoutez ceci
 
 // Synchronisez la base de données
 sequelize.sync();

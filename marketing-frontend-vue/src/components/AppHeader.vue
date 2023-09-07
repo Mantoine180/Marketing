@@ -107,10 +107,6 @@
       this.backgroundColor = color.toHEXA().toString();
       pickr.hide();
     });
-
-    document.getElementById('colorPicker').addEventListener('click', () => {
-      pickr.show();
-    });
   },
 
   beforeUnmount() {
