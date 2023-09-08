@@ -4,23 +4,23 @@ module.exports = (sequelize) => {
     const Infos = sequelize.define('Infos', {
       annonce: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
       },
       titrePrincipal: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
       },
       descrition: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
       },
       photo: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
       },
       color: {
         type:DataTypes.STRING,
-        allowNull:false
+        allowNull:true
       }
     });
   

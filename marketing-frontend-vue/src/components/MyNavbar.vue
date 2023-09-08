@@ -22,9 +22,9 @@
 </template>
 
 <script>
+import api from '../api/axiosInstance.js';
 export default {
     name: "MyNavbar",
-
     data() {
         return {
             titre: "Veuillez mettre la date de l'exposition"
@@ -32,10 +32,27 @@ export default {
     },
 
     methods: {
-        sauvegardeTitre() {
-            console.log('Bonjour');
-            localStorage.setItem('messageSauvegarde', this.titre);
+        async sauvegardeTitre() {
+        try {
+            const response = await api.put('/infos', { annonce: this.titre });
+
+            if (response.status === 200) {
+                console.log('Titre updated successfully');
+            }
+        } catch (error) {
+            if (error.response && error.response.status === 404) {
+                // Si la ligne n'existe pas, envoyez une requête POST pour la créer
+                try {
+                    const postResponse = await api.post('/infos', { annonce: this.titre });
+                    console.log('Titre added successfully', postResponse.data);
+                } catch (postError) {
+                    console.error('Error adding titre:', postError);
+                }
+            } else {
+                console.error('Error updating titre:', error);
+            }
         }
+    }
     },
 
     mounted() {

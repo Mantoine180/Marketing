@@ -108,6 +108,7 @@
   </template>
   
   <script>
+  import api from '../api/axiosInstance.js';
   export default {
     data() {
     return {
@@ -145,36 +146,49 @@
     * Chercher une concession dans la base de données
     * 
     ***************************************************************************************/
-    async fetchConcessions() {
-      try {
-        const response = await fetch('http://localhost:3000/api/concession');
-        const data = await response.json();
-        this.concessions = data;
-      } catch (error) {
-        console.error('Error fetching concessions:', error);
-      }
-    },
-    /***************************************************************************************
-    **************************************************************************************** 
-    ****************************************************************************************/
-    async fetchHoraires() {
-      try {
-        const response = await fetch('http://localhost:3000/api/horaires');
-        const data = await response.json();
-    
-        // Formater les horaires au format "hh:mm"
-        const formattedHoraires = data.map(horaire => {
-          const heureDebut = horaire.heureDebut; // Garder les 5 premiers caractères (hh:mm)
-          const heureFin = horaire.heureFin; // Garder les 5 premiers caractères (hh:mm)
-          return `${heureDebut} - ${heureFin}`;
-        });
-    
-        this.horaires = formattedHoraires;
-      } catch (error) {
-        console.error('Error fetching concessions:', error);
-      }
-    },    
+  async fetchConcessions() {
+  try {
+    const response = await api.get('/concession');
+    this.concessions = response.data;
+  } catch (error) {
+    console.error('Error fetching concessions:', error);
+  }
+},
 
+/***************************************************************************************
+**************************************************************************************** 
+****************************************************************************************/
+
+async fetchHoraires() {
+  try {
+    const response = await api.get('/horaires');
+    const data = response.data;
+
+    // Formater les horaires au format "hh:mm"
+    const formattedHoraires = data.map(horaire => {
+      const heureDebut = horaire.heureDebut; // Garder les 5 premiers caractères (hh:mm)
+      const heureFin = horaire.heureFin; // Garder les 5 premiers caractères (hh:mm)
+      return `${heureDebut} - ${heureFin}`;
+    });
+
+    this.horaires = formattedHoraires;
+  } catch (error) {
+    console.error('Error fetching horaires:', error);
+  }
+},
+
+async fetchHorairesId() {
+      try {
+        const response = await api.get('/horaires');
+        const data = response.data;
+    
+        // Extraire les ids et les stocker dans le tableau horaires_id
+        const horaires_id = data.map(horaire => horaire.id);
+        this.horaires_id = horaires_id; // Assurez-vous que vous avez défini horaires_id dans la section data de votre composant
+      } catch (error) {
+        console.error('Error fetching id:', error);
+      }
+},
 
 
 
@@ -196,76 +210,46 @@
     * Ajouter une concession
     * 
     ***************************************************************************************/
-    async ajouterConcession() {
-      const nouvelleConcession = this.concessionInput.trim();
+  async ajouterConcession() {
+    const nouvelleConcession = this.concessionInput.trim();
     // Vérifiez si nouvelleConcession n'est pas vide avant de l'envoyer au serveur
-      if (nouvelleConcession !== '' && !this.concessions.includes(nouvelleConcession)) {
-        this.concessions.push(nouvelleConcession);
-        try {
-          const response = await fetch('http://localhost:3000/api/concession', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ nomConcession: nouvelleConcession }) // Assurez-vous que la clé est "nomConcession"
-          });
-          const data = await response.json();
-          this.concessionInput = ''; // Réinitialiser l'entrée de la concession
-        } catch (error) {
-          console.error('Error adding concession:', error);
-        }
-      }
-    },
-    /***************************************************************************************
-    **************************************************************************************** 
-    ***************************************************************************************/
-    /**************************************************************************************
-    * 
-    * Supprimer une concession
-    * 
-    ***************************************************************************************/
-    async supprimerConcession(concession) {
-      const index = this.concessions.indexOf(concession);
-      if (index !== -1) {
-        try {
-          const response = await fetch(`http://localhost:3000/api/concession/${encodeURIComponent(concession)}`, {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          });
-          if (response.ok) {
-            this.concessions.splice(index, 1);
-            console.log('Concession deleted successfully');
-          } else {
-            console.error('Error deleting the concession:', response.statusText);
-          }
-        } catch (error) {
-          console.error('Error deleting the concession:', error);
-        }
-      }
-    }, 
-    /***************************************************************************************
-    **************************************************************************************** 
-    ****************************************************************************************/
-
-    /**************************************************************************************
-    * 
-    * Supprimer toute les concessions
-    * 
-    ***************************************************************************************/
-    async supprimerConcessions(){
-      this.concessions=[];
+    if (nouvelleConcession !== '' && !this.concessions.includes(nouvelleConcession)) {
+      this.concessions.push(nouvelleConcession);
       try {
-        const response = await fetch('http://localhost:3000/api/concession', {method: 'DELETE'});
-        const data = await response.json();
+        await api.post('/concession', { nomConcession: nouvelleConcession });
+        this.concessionInput = ''; // Réinitialiser l'entrée de la concession
       } catch (error) {
-        console.error('Error deleting concessions:', error);
+        console.error('Error adding concession:', error);
       }
-    },
-    /***************************************************************************************
-    **************************************************************************************** 
-    ***************************************************************************************/
+    }
+  },
+
+  async supprimerConcession(concession) {
+    const index = this.concessions.indexOf(concession);
+    if (index !== -1) {
+      try {
+        const response = await api.delete(`/concession/${encodeURIComponent(concession)}`);
+        if (response.status === 200) {
+          this.concessions.splice(index, 1);
+          console.log('Concession deleted successfully');
+        } else {
+          console.error('Error deleting the concession:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error deleting the concession:', error);
+      }
+    }
+  },
+
+  async supprimerConcessions() {
+    this.concessions = [];
+    try {
+      await api.delete('/concession');
+    } catch (error) {
+      console.error('Error deleting concessions:', error);
+    }
+  },
+
     
     
 
@@ -288,96 +272,64 @@
     * Ajouter les horraires
     * 
     ***************************************************************************************/
-    ajouterHoraires() {
-      // Utilisez les valeurs des propriétés pour appeler votre fonction ajouterHoraires()
-      const values = {
-        morningStart: this.morningStart,
-        pauseTime: this.pauseTime,
-        afternoonStart: this.afternoonStart,
-        afternoonEnd: this.afternoonEnd,
-        ecartCreneaux: this.ecartCreneaux,
-      };
-    
-      // Appelez votre fonction ajouterHoraires() avec les valeurs récupérées
-      // Ici, vous pouvez envoyer les données au serveur ou effectuer toute autre action requise
-      console.log(values);
-    
-      // Créez un tableau pour stocker les horaires sous forme d'objets avec les propriétés "heureDebut" et "heureFin"
-      const horairesData = [];
-    
-      let morningStartObj = new Date(`2000-01-01T${values.morningStart}:00`);
-      let morningPauseObj = new Date(`2000-01-01T${values.pauseTime}:00`);
-      let afternoonStartObj = new Date(`2000-01-01T${values.afternoonStart}:00`);
-      let afternoonEndObj = new Date(`2000-01-01T${values.afternoonEnd}:00`);
-    
-      // Boucle pour créer les créneaux horaires
-      this.ajoutertableau(morningStartObj, morningPauseObj, values.ecartCreneaux);
-      this.ajoutertableau(afternoonStartObj, afternoonEndObj, values.ecartCreneaux);
-    
-      for (let i = 0; i < this.horaires.length; i++) {
-        const [heureDebut, heureFin] = this.horaires[i].split(' - ');
-        // Vérifier que les horaires ne sont pas vides et ne contiennent pas d'espaces avant de les ajouter au tableau horairesData
-        if (heureDebut && heureFin && heureDebut.trim() !== '' && heureFin.trim() !== '') {
-          horairesData.push({
-            heureDebut: heureDebut.trim(),
-            heureFin: heureFin.trim(),
-          });
-        }
-      }
-    
-      // Effectuer la requête POST vers le serveur
-      fetch('http://localhost:3000/api/horaires', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ horaires: horairesData })
-      })
-        .then(response => {
-          if (!response.ok) {
-            return response.text().then(text => {
-              throw new Error(text);
-            });
-          }
-          return response.json();
-        })
-        .then(data => {
-          // Traitement de la réponse du serveur si nécessaire
-          console.log(data);
-        })
-        .catch(error => {
-          console.error('Error sending horaires:', error);
-        });
-    },    
+  async ajouterHoraires() {
+  // Utilisez les valeurs des propriétés pour appeler votre fonction ajouterHoraires()
+  const values = {
+    morningStart: this.morningStart,
+    pauseTime: this.pauseTime,
+    afternoonStart: this.afternoonStart,
+    afternoonEnd: this.afternoonEnd,
+    ecartCreneaux: this.ecartCreneaux,
+  };
 
-    ajoutertableau(debut,fin,ecartCreneaux){
-      while (debut < fin) {
-        const heureDebutCreneau = debut.toTimeString().slice(0, 5); // Heure de début du créneau
-        debut.setMinutes(debut.getMinutes() +ecartCreneaux); // Incrémenter de l'écart créneaux pour le prochain créneau
-        const heureFinCreneau = debut.toTimeString().slice(0, 5); // Heure de fin du créneau
+  // Appelez votre fonction ajouterHoraires() avec les valeurs récupérées
+  console.log(values);
 
-        // Ajouter le créneau horaire au tableau
-        if(debut<=fin)
-        {
-            this.horaires.push(`${heureDebutCreneau} - ${heureFinCreneau}`);
-        }
-      }
-    },
+  let morningStartObj = new Date(`2000-01-01T${values.morningStart}:00`);
+  let morningPauseObj = new Date(`2000-01-01T${values.pauseTime}:00`);
+  let afternoonStartObj = new Date(`2000-01-01T${values.afternoonStart}:00`);
+  let afternoonEndObj = new Date(`2000-01-01T${values.afternoonEnd}:00`);
 
-    async supprimerHoraires() {
-      this.horaires = [];
-      try {
-        const response = await fetch('http://localhost:3000/api/horaires', { method: 'DELETE' });
-        if (!response.ok) {
-          const errorMessage = await response.text();
-          throw new Error(errorMessage);
-        }
-        const data = await response.json();
-        console.log(data.message); // Afficher le message de succès du serveur
-      } catch (error) {
-        console.error('Error deleting horaires:', error);
-      }
-    },
+  this.ajoutertableau(morningStartObj, morningPauseObj, values.ecartCreneaux);
+  this.ajoutertableau(afternoonStartObj, afternoonEndObj, values.ecartCreneaux);
+
+  const horairesData = this.horaires.map(h => {
+    const [heureDebut, heureFin] = h.split(' - ');
+    return {
+      heureDebut: heureDebut.trim(),
+      heureFin: heureFin.trim(),
+    };
+  });
+
+  try {
+    const response = await api.post('/horaires', { horaires: horairesData });
+    console.log(response.data);
+  } catch (error) {
+    console.error('Error sending horaires:', error);
+  }
+  this.fetchHorairesId();
+},
+
+ajoutertableau(debut, fin, ecartCreneaux) {
+  while (debut < fin) {
+    const heureDebutCreneau = debut.toTimeString().slice(0, 5);
+    debut.setMinutes(debut.getMinutes() + ecartCreneaux);
+    const heureFinCreneau = debut.toTimeString().slice(0, 5);
+    if (debut <= fin) {
+      this.horaires.push(`${heureDebutCreneau} - ${heureFinCreneau}`);
+    }
+  }
+},
+
+async supprimerHoraires() {
+  this.horaires = [];
+  try {
+    const response = await api.delete('/horaires');
+    console.log(response.data.message); // Afficher le message de succès du serveur
+  } catch (error) {
+    console.error('Error deleting horaires:', error);
+  }
+},
     /***************************************************************************************
     **************************************************************************************** 
     ***************************************************************************************/
@@ -407,52 +359,44 @@
     * 
     ***************************************************************************************/
 // Dans votre code Vue.js
-  async ajouterAutomobile(concession){
-  console.log('Entrée dans le programme');
+async ajouterAutomobile(concession) {
   const nouveauModele = this.modeleInput.trim();
-  const nbPlaces = parseInt(this.placesInput); // Convertir en nombre entier
+  const nbPlaces = parseInt(this.placesInput);
 
-  // Vérifiez si nouveauModele n'est pas vide et nbPlaces est un nombre valide
-  if (nouveauModele !== '' && !isNaN(nbPlaces) && nbPlaces >= 0) {
+  if (nouveauModele && !isNaN(nbPlaces) && nbPlaces >= 0) {
     try {
       // Recherchez l'ID de la concession en utilisant son nom
-      const responseConcession = await fetch(`http://localhost:3000/api/modeles/${encodeURIComponent(concession)}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      const { data: concessions_id } = await api.get(`/modeles/${encodeURIComponent(concession)}`);
+
+      // Insertion du nouveau modèle avec l'ID de la concession
+      await api.post('/modeles', {
+        modele: nouveauModele,
+        concessionId: concessions_id
       });
-      console.log(responseConcession);
-      if (responseConcession.ok) {
-        const concessions = await responseConcession.json();
-        const foundConcession = concessions.find(c => c.nomConcession === concession);
+      console.log('Model added successfully!');
 
-        if (foundConcession) {
-          // Insérez le nouveau modèle avec l'ID de la concession trouvée
-          const responseModele = await fetch('http://localhost:3000/api/modeles', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ modèle: nouveauModele, concessionId: foundConcession.id })
-          });
+      // Récupérer l'ID du modèle automobile juste après qu'il soit créé
+      const params = new URLSearchParams({ concessionId: concessions_id, modele: nouveauModele });
+      const { data: modeleData } = await api.get(`/reservation/idconcession/?${params}`);
+      const modele_id = modeleData;
+      console.log('ID du modèle:', modele_id);
 
-          if (responseModele.ok) {
-            // Le modèle a été inséré avec succès
-          } else {
-            console.error('Error adding model:', responseModele.status);
-          }
-        } else {
-          console.error('Concession not found:', concession);
-        }
-      } else {
-        console.error('Error fetching concessions:', responseConcession.status);
-      }
-    }catch (error) {
-      console.error('Error adding model:', error);
+      // Effectuer les requêtes POST vers le serveur pour mettre en place les réservations
+      const reservationPromises = this.horaires_id.map(creneauId => 
+        api.post('/reservation', {
+          quantiteMax: nbPlaces,
+          creneauId,
+          modeleId: modele_id
+        })
+      );
+
+      await Promise.all(reservationPromises);
+      console.log('All reservations made successfully!');
+
+    } catch (error) {
+      console.error('Error:', error);
     }
   }
-  this.togglePopover(concession); // Fermer le popover
 }
 
 
@@ -460,6 +404,7 @@
   mounted(){
     this.fetchConcessions();
     this.fetchHoraires();
+    this.fetchHorairesId();
   },
 }
   </script>
