@@ -24,7 +24,7 @@
                             Changer la photo
                             <input type="file" @change="handleImageChange" style="display: none;">
                         </label>
-                        <img :src="imagePath" :key="imagePath" alt="Photo">
+                        <img :src="image64" :key="image64" alt="Photo">
                     </div>
                 </div>   
             </div>
@@ -32,63 +32,105 @@
 </template>
   
   <script>
+  import api from '../api/axiosInstance.js';
+  
   export default {
     data() {
     return {
-      backgroundColor: localStorage.getItem('backgroundColor') || '#FFFFFF',
-
-      titre: "Veullez mettre le modèle",
-      description: "Voici le texte qui contiendra la description du salon ainsi que des modèles automobiles mis en vente"
+      backgroundColor:'#C68C0A',
+      titre:"Veuillez mettre le modèle",
+      description: "Voici le texte qui contiendra la description du salon ainsi que des modèles automobiles mis en vente",
+      image64: "",
     };
   },
 
   methods: {
-    sauvegardeTitre() {
-      localStorage.setItem('messageModele', this.titre);
+    async fetchInfos(){
+      try {
+        const response = await api.get('/infos');
+
+        this.titre = response.data.titrePrincipal;
+        this.description = response.data.description;
+        this.backgroundColor= response.data.color;
+        this.image64 = response.data.photo;
+        
+        if (this.titre === "" || this.titre === null) {
+          this.titre = "Veuillez mettre le modèle";
+        }
+        if (this.description === "" || this.description === null) {
+          this.description = "Voici le texte qui contiendra la description du salon ainsi que des modèles automobiles mis en vente";
+        }
+        if (this.backgroundColor === null) {
+          this.backgroundColor = '#C68C0A';
+        }
+      } catch (error) {
+        console.error('Error fetching infos:', error);
+      }
     },
-    sauvegardeDescription() {
-      localStorage.setItem('description-texte', this.description);
+    async sauvegardeTitre() {
+      try {
+        const response = await api.put('/infos', { titrePrincipal: this.titre });
+        if (response.status === 200) {
+          console.log('Titre updated successfully');
+        }
+      } catch (error) {
+          console.error('Error updating titre:', error);
+      }
     },
-    handleImageChange(event) {
+    async sauvegardeDescription() {
+      try {
+        const response = await api.put('/infos', { description: this.description });
+        if (response.status === 200) {
+          console.log('Description updated successfully');
+        }
+      } catch (error) {
+          console.error('Error updating description:', error);
+      }
+    },
+
+    async handleImageChange(event) {
       const file = event.target.files[0];
       const reader = new FileReader();
 
-      reader.onload = () => {
-        this.imagePath = reader.result;
-        localStorage.setItem('savedImage', this.imagePath);
+      reader.onload = async () => {
+        this.image64 = reader.result;
+        
+        try {
+          // Envoyez la requête PUT avec le base64 dans le champ photo
+          const response = await api.put('/infos', { photo: this.image64 });
+          if (response.status === 200) {
+            console.log('Image updated successfully');
+          }
+        } catch (error) {
+          console.error('Error updating image:', error);
+        }
       };
 
       if (file) {
         reader.readAsDataURL(file);
       }
-    }
-  },
+    },
 
-  created() {
-    const savedImage = localStorage.getItem('savedImage');
-    if (savedImage) {
-      this.imagePath = savedImage;
-    }
+
+    async saveColor() {
+        try {
+          const response = await api.put('/infos', { color: this.backgroundColor });
+          if (response.status === 200) {
+            console.log('Color updated successfully');
+          }
+        } catch (error) {
+            console.error('Error updating color:', error);
+        }
+      }
   },
 
   mounted() {
-    const messageSauvegarde = localStorage.getItem('messageModele');
-    if (messageSauvegarde) {
-      this.titre = messageSauvegarde;
-    }
-
-    const messageDescription = localStorage.getItem('description-texte');
-    if (messageDescription) {
-      this.description = messageDescription;
-    }
-
+    this.fetchInfos();
     const pickr = Pickr.create({
       el: '#colorPicker',
       theme: 'classic',
       default: this.backgroundColor,
-      components: {
-        preview: true,
-        opacity: true,
+      components: {   
         hue: true,
         interaction: {
           hex: true,
@@ -105,19 +147,10 @@
 
     pickr.on('save', color => {
       this.backgroundColor = color.toHEXA().toString();
+      this.saveColor();
       pickr.hide();
     });
   },
-
-  beforeUnmount() {
-    localStorage.setItem('savedImage', this.imagePath);
-  },
-
-  watch: {
-    backgroundColor(newColor) {
-      localStorage.setItem('backgroundColor', newColor);
-    }
-  }
   }
   </script>
   

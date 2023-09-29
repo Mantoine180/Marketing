@@ -32,6 +32,18 @@ export default {
     },
 
     methods: {
+        async fetchTitre() {
+            try {
+                const response = await api.get('/infos');
+                this.titre = response.data.annonce;
+                if (this.titre === "" || this.titre === null) {
+                    this.titre = "Veuillez mettre le modèle";
+                }
+            } catch (error) {
+                console.error('Error fetching titre:', error);
+            }
+        },
+        
         async sauvegardeTitre() {
         try {
             const response = await api.put('/infos', { annonce: this.titre });
@@ -40,26 +52,14 @@ export default {
                 console.log('Titre updated successfully');
             }
         } catch (error) {
-            if (error.response && error.response.status === 404) {
-                // Si la ligne n'existe pas, envoyez une requête POST pour la créer
-                try {
-                    const postResponse = await api.post('/infos', { annonce: this.titre });
-                    console.log('Titre added successfully', postResponse.data);
-                } catch (postError) {
-                    console.error('Error adding titre:', postError);
-                }
-            } else {
-                console.error('Error updating titre:', error);
-            }
+            console.error('Error updating titre:', error);
         }
-    }
+        }
     },
 
     mounted() {
-        const messageSauvegarde = localStorage.getItem('messageSauvegarde');
-        if (messageSauvegarde) {
-            this.titre = messageSauvegarde;
-        }
+        this.fetchTitre();
+
     }
 }
 </script>

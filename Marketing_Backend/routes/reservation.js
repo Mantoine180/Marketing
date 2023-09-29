@@ -31,7 +31,6 @@ reservation.get('/idconcession', async (req, res) => {
   
 reservation.post('/', async (req, res) => {
   try {
-    console.log(req.body);
     // Prenez les données du corps de la requête
     const { quantiteMax,creneauId,modeleId } = req.body; // Utilisez "modele" sans accent
     // Validation

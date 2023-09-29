@@ -53,40 +53,54 @@
             </div>  
           <button class="btn btn-danger" @click="supprimerHoraires">Supprimer les horaires</button>
         </div>
-        <div v-for="concession in concessions" :key="concession" class="section" :class="{ 'd-none': section !== concession }">
-    <div class="container">
-      <div class="row justify-content-center align-items-center">
-        <div class="col text-center">
-          <h3 class="nom_concession">{{ concession }}</h3>
-        </div>
-        <div class="col text-right">
-          <button 
-            class="btn btn-primary"
-            @click.stop="togglePopover(concession)"
-            :id="'popover-' + concession"
-          >
-            Ajouter un modèle
-          </button>
-          
-          <b-popover :target="'popover-' + concession" v-model="popovers[concession]">
-            <template #default>
-              <form @submit.prevent="ajouterAutomobile(concession)">
-                <div class="form-group">
-                  <label :for="'autoName-' + concession">Nom du modèle</label>
-                  <input v-model="modeleInput" type="text" class="form-control" :id="'autoName-' + concession">
-                </div>
-                <div class="form-group">
-                  <label :for="'inputEmail-' + concession">Places disponibles</label>
-                  <input type="number" min="1" class="form-control" :id="'inputEmail-' + concession" v-model="placesInput">
-                </div>
-                <button type="submit" class="btn btn-primary">Créer modèle</button>
-              </form>
-            </template>
-          </b-popover>
+      <div>
+
+    <div v-for="concession in concessions" :key="concession" class="section" :class="{ 'd-none': section !== concession }">
+      <div class="container">
+        <div class="row justify-content-center align-items-center">
+          <div class="col text-center">
+            <h3 class="nom_concession">{{ concession }}</h3>
+          </div>
+          <div class="col text-right">
+            <button class="btn btn-primary" @click.stop="togglePopover(concession)" :id="'popover-' + concession">
+              Ajouter un modèle
+            </button>
+            <b-popover :target="'popover-' + concession" v-model="popovers[concession]" triggers="focus">
+              <template #default>
+                <form @submit.prevent="ajouterAutomobile(concession)">
+                  <div class="form-group">
+                    <label>Nom du modèle</label>
+                    <input v-model="modeleInput" type="text" class="form-control" :id="'autoName-' + concession">
+                  </div>
+                  <div class="form-group">
+                    <label>Places disponibles</label>
+                    <input type="number" min="1" class="form-control" :id="'placesInput-' + concession" v-model="placesInput">
+                  </div>
+                  <button type="submit" class="btn btn-primary">Créer modèle</button>
+                </form>
+              </template>
+            </b-popover>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
+      <b-card
+    title="Card Title"
+    img-src="https://picsum.photos/600/300/?image=25"
+    img-alt="Image"
+    img-top
+    tag="article"
+    style="max-width: 20rem;"
+    class="mb-2"
+  >
+    <b-card-text>
+      Some quick example text to build on the card title and make up the bulk of the card's content.
+    </b-card-text>
+
+    <b-button href="#" variant="primary">Go somewhere</b-button>
+  </b-card>
+    </div> 
+
+ </div>
 </div>   
     <!-- Footer Start -->
 	    <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-md-5" style="margin-top: 90px;">
@@ -124,23 +138,13 @@
       ecartCreneaux: null, 
 
       popovers: {},
+      
       modeleInput: '',
       placesInput: ''
     };
   },
   methods: {
-
-    togglePopover(concession) {
-      this.$set(this.popovers, concession, !this.popovers[concession]);
-    },
-    isPopoverOpen(concession) {
-      // Renvoie true si le popover est ouvert pour la concession donnée
-      return this.openPopovers[concession];
-    },
   
-
-
-
     /**************************************************************************************
     * 
     * Chercher une concession dans la base de données
@@ -397,15 +401,20 @@ async ajouterAutomobile(concession) {
       console.error('Error:', error);
     }
   }
-}
-
-
-  },
+  }
+},
   mounted(){
     this.fetchConcessions();
     this.fetchHoraires();
     this.fetchHorairesId();
+
+  // Ajoutez un écouteur d'événement click au document pour gérer les clics en dehors des popovers
+  document.addEventListener('click', this.closePopoversOnClickOutside);
   },
+  beforeUnmount() {
+  // Supprimez l'écouteur d'événement lorsque le composant est détruit
+  document.removeEventListener('click', this.closePopoversOnClickOutside);
+},
 }
   </script>
   
