@@ -49,13 +49,4 @@ reservation.post('/', async (req, res) => {
   }
 });
 
-reservation.delete('/', async (req, res) => {
-  try {
-
-  } catch (error) {
-    console.error('Error deleting reservation:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
     module.exports = reservation;    

@@ -1,9 +1,9 @@
 const express = require('express');
-const modeles = express.Router();
+const concessions = express.Router();
 const { Concession } = require('../db'); // Importer l'instance Sequelize
 
 
-modeles.get('/', async (req, res) => {
+concessions.get('/', async (req, res) => {
   try {
     const concessions = await Concession.findAll({
       raw: true, // Récupérer les données brutes (JSON) sans le nom de la table
@@ -20,14 +20,14 @@ modeles.get('/', async (req, res) => {
   }
 });
 
-modeles.post('/', async (req, res) => {
+concessions.post('/', async (req, res) => {
   const data = req.body;
 
   const concessionCreated = await Concession.create(data);
   res.json(concessionCreated);
 });
 
-modeles.delete('/', async (req, res) => {
+concessions.delete('/', async (req, res) => {
   try {
     // Effacer toutes les données de la table Concession
     await Concession.destroy({
@@ -42,7 +42,7 @@ modeles.delete('/', async (req, res) => {
   }
 });
 
-modeles.delete('/:concession', async (req, res) => {
+concessions.delete('/:concession', async (req, res) => {
   const { concession } = req.params;
   
   try {
@@ -63,4 +63,4 @@ modeles.delete('/:concession', async (req, res) => {
   }
 });
 
-module.exports = modeles;
+module.exports = concessions;

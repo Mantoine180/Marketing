@@ -1,6 +1,6 @@
 <template>
  <div id="menu_deroulant_container">
-        <div class="d-flex justify-content-center">
+        <div class="d-flex justify-content-center  ">
           <select class="form-select form-select-lg w-75 drop_list" v-model="section" aria-label="Default select example">
             <option value="" class="text-center">Choisir la concession</option>
             <option value="section1" class="text-center">Ajouter/Suprimer une concession</option>
@@ -53,19 +53,15 @@
             </div>  
           <button class="btn btn-danger" @click="supprimerHoraires">Supprimer les horaires</button>
         </div>
-      <div>
+    
 
     <div v-for="concession in concessions" :key="concession" class="section" :class="{ 'd-none': section !== concession }">
-      <div class="container">
         <div class="row justify-content-center align-items-center">
-          <div class="col text-center">
-            <h3 class="nom_concession">{{ concession }}</h3>
-          </div>
           <div class="col text-right">
-            <button class="btn btn-primary" @click.stop="togglePopover(concession)" :id="'popover-' + concession">
+            <button class="btn btn-primary" :id="'popover-' + concession" target="popover-button-open">
               Ajouter un modèle
             </button>
-            <b-popover :target="'popover-' + concession" v-model="popovers[concession]" triggers="focus">
+            <b-popover :target="'popover-' + concession" >
               <template #default>
                 <form @submit.prevent="ajouterAutomobile(concession)">
                   <div class="form-group">
@@ -73,34 +69,42 @@
                     <input v-model="modeleInput" type="text" class="form-control" :id="'autoName-' + concession">
                   </div>
                   <div class="form-group">
+                    <label class="btn btn-primary button-primary btn-sm">
+                            Ajouter la photo de l'automobile
+                            <input type="file" @change="handleImageChange" style="display: none;">
+                    </label>
+                  </div>
+                  <div class="form-group">
                     <label>Places disponibles</label>
                     <input type="number" min="1" class="form-control" :id="'placesInput-' + concession" v-model="placesInput">
                   </div>
+
                   <button type="submit" class="btn btn-primary">Créer modèle</button>
                 </form>
               </template>
             </b-popover>
           </div>
-        </div>
-      </div>
-      <b-card
-    title="Card Title"
-    img-src="https://picsum.photos/600/300/?image=25"
-    img-alt="Image"
-    img-top
-    tag="article"
-    style="max-width: 20rem;"
-    class="mb-2"
-  >
-    <b-card-text>
-      Some quick example text to build on the card title and make up the bulk of the card's content.
-    </b-card-text>
-
-    <b-button href="#" variant="primary">Go somewhere</b-button>
-  </b-card>
-    </div> 
-
- </div>
+        
+        <b-card-group deck>
+          
+          <div v-for="modele in modeles" :key="modele" >
+              <b-card
+                v-if="modele.concession===concession"
+                :title="modele.modele"
+                :img-src="modele.photo"
+                img-alt="Image"
+                style="max-width: 20rem;"
+                class="mb-2 pull-right "
+                >
+                <b-button @click="fermerModele(modele)" class="close position-absolute top-0 end-0 btn-danger custom-close-icon" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </b-button>
+                <b-button href="#" variant="primary">Réserver une horaire</b-button>
+              </b-card>
+          </div>
+        </b-card-group>  
+      </div>  
+    </div>
 </div>   
     <!-- Footer Start -->
 	    <div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-md-5" style="margin-top: 90px;">
@@ -109,13 +113,6 @@
                 <a href="index-2.html" class="navbar-brand">
                     <h1 class="m-0 mt-n2 text-white display-5">Groupe PEYROT</h1>
                 </a>
-                <p><br></p>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-5">
-            </div>
-            <div class="col-lg-3 col-md-6 mb-5">
-            </div>
-            <div class="col-lg-3 col-md-6 mb-5">          
             </div>
         </div>
     </div>
@@ -128,6 +125,7 @@
     return {
       horaires:[],
       concessions: [],
+      modeles: [],
       section: '',
       concessionInput: '',
 
@@ -135,13 +133,25 @@
       pauseTime: '', // Propriété pour stocker la valeur de l'heure de la pause
       afternoonStart: '', // Propriété pour stocker la valeur de l'heure de début de l'après-midi
       afternoonEnd: '', // Propriété pour stocker la valeur de l'heure de fin de l'après-midi
-      ecartCreneaux: null, 
-
-      popovers: {},
+      ecartCreneaux: null,
       
       modeleInput: '',
-      placesInput: ''
+      placesInput: '',
+
+      newModele:{
+        modele: "",
+        photo: '',
+        concession:""
+      },
     };
+  },
+
+  watch: {
+    section() {
+      this.modeleInput = '';
+      this.placesInput = '';
+      this.newModele.photo = '';
+    }
   },
   methods: {
   
@@ -154,14 +164,15 @@
   try {
     const response = await api.get('/concession');
     this.concessions = response.data;
+    console.log(this.concessions);
   } catch (error) {
     console.error('Error fetching concessions:', error);
   }
 },
 
-/***************************************************************************************
-**************************************************************************************** 
-****************************************************************************************/
+  /***************************************************************************************
+  **************************************************************************************** 
+  ****************************************************************************************/
 
 async fetchHoraires() {
   try {
@@ -194,26 +205,22 @@ async fetchHorairesId() {
       }
 },
 
+async fetchModeles() {
+  try {
+    const response = await api.get(`/modeles`);
+    this.modeles = response.data;
+    console.log(this.modeles);
+  } catch (error) {
+    console.error('Error fetching modeles:', error);
+  }
+},
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /**************************************************************************************
-    * 
-    * Ajouter une concession
-    * 
-    ***************************************************************************************/
+  /**************************************************************************************
+  * 
+  * Ajouter une concession
+  * 
+  ***************************************************************************************/
   async ajouterConcession() {
     const nouvelleConcession = this.concessionInput.trim();
     // Vérifiez si nouvelleConcession n'est pas vide avant de l'envoyer au serveur
@@ -256,17 +263,6 @@ async fetchHorairesId() {
 
     
     
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -363,58 +359,100 @@ async supprimerHoraires() {
     * 
     ***************************************************************************************/
 // Dans votre code Vue.js
+
+async handleImageChange(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = async () => {
+        this.newModele.photo = reader.result; // Met à jour la propriété photo
+      };
+
+      if (file) {
+        reader.readAsDataURL(file);
+      }
+    },
+
 async ajouterAutomobile(concession) {
-  const nouveauModele = this.modeleInput.trim();
   const nbPlaces = parseInt(this.placesInput);
+  this.newModele.modele = this.modeleInput.trim();
+  this.newModele.concession = concession;
+  console.log(this.newModele);
+  const modeleExiste = this.modeles.some(modele => modele.modele === this.newModele.modele && modele.concession === concession);
+  if (this.newModele.modele && !isNaN(nbPlaces) && nbPlaces >= 0  && !modeleExiste) {
+      try {
+        // Recherchez l'ID de la concession en utilisant son nom
+        const { data: concessions_id } = await api.get(`/modeles/id/${encodeURIComponent(concession)}`);
 
-  if (nouveauModele && !isNaN(nbPlaces) && nbPlaces >= 0) {
-    try {
-      // Recherchez l'ID de la concession en utilisant son nom
-      const { data: concessions_id } = await api.get(`/modeles/${encodeURIComponent(concession)}`);
+        // Insertion du nouveau modèle avec l'ID de la concession
+        await api.post('/modeles', {
+          modele: this.newModele.modele,
+          concessionId: concessions_id,
+          photo: this.newModele.photo,
+        });
+        this.fetchModeles(); 
 
-      // Insertion du nouveau modèle avec l'ID de la concession
-      await api.post('/modeles', {
-        modele: nouveauModele,
-        concessionId: concessions_id
-      });
-      console.log('Model added successfully!');
+        // Récupérer l'ID du modèle automobile juste après qu'il soit créé
+        const params = new URLSearchParams({ concessionId: concessions_id, modele: this.newModele.modele});
+        const { data: modeleData } = await api.get(`/reservation/idconcession/?${params}`);
+        const modele_id = modeleData;
+        console.log('ID du modèle:', modele_id);
 
-      // Récupérer l'ID du modèle automobile juste après qu'il soit créé
-      const params = new URLSearchParams({ concessionId: concessions_id, modele: nouveauModele });
-      const { data: modeleData } = await api.get(`/reservation/idconcession/?${params}`);
-      const modele_id = modeleData;
-      console.log('ID du modèle:', modele_id);
+        // Effectuer les requêtes POST vers le serveur pour mettre en place les réservations
+        const reservations = this.horaires_id.map(creneauId => 
+          api.post('/reservation', {
+            quantiteMax: nbPlaces,
+            creneauId,
+            modeleId: modele_id
+          })
+        );
 
-      // Effectuer les requêtes POST vers le serveur pour mettre en place les réservations
-      const reservationPromises = this.horaires_id.map(creneauId => 
-        api.post('/reservation', {
-          quantiteMax: nbPlaces,
-          creneauId,
-          modeleId: modele_id
-        })
-      );
+        await Promise.all(reservations);
+        console.log('All reservations made successfully!');
 
-      await Promise.all(reservationPromises);
-      console.log('All reservations made successfully!');
-
-    } catch (error) {
-      console.error('Error:', error);
+      } 
+      catch (error) {
+        console.error('Error:', error);
+      }
     }
+  },
+
+  async fermerModele(modele) {
+  try {
+    console.log('Deleting model:', modele.modele);
+    const params = new URLSearchParams({
+      modele: modele.modele,
+      concession: modele.concession
+    });
+    const response = await api.delete(`/modeles/?${params}`);
+    if (response.status === 200) {
+      const index = this.modeles.indexOf(modele);
+      this.modeles.splice(index, 1);
+      console.log('Model deleted successfully!');
+    }
+  } catch (error) {
+    console.error('Error deleting model:', error);
   }
-  }
+}
+
 },
   mounted(){
     this.fetchConcessions();
     this.fetchHoraires();
     this.fetchHorairesId();
-
-  // Ajoutez un écouteur d'événement click au document pour gérer les clics en dehors des popovers
-  document.addEventListener('click', this.closePopoversOnClickOutside);
+    this.fetchModeles(); 
   },
-  beforeUnmount() {
-  // Supprimez l'écouteur d'événement lorsque le composant est détruit
-  document.removeEventListener('click', this.closePopoversOnClickOutside);
-},
+ 
 }
   </script>
-  
+
+<style scoped>
+.custom-close-icon {
+  top: 0.25rem;
+  right: 0.5rem;
+  font-size: 3rem;
+  font-weight: lighter;
+  line-height: 1;
+  opacity: .5;
+}
+</style>

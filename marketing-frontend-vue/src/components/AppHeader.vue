@@ -16,8 +16,9 @@
                         <textarea v-model="description" @input="sauvegardeDescription" rows="1" class="form-control col"></textarea>
                         <input type="checkbox" id="blankCheckbox" value="option1" aria-label="..." class="col-auto">
                     </div>    
-                        <a href="concession.html" target="_parent" class="btn btn-dark text-uppercase mt-1 py-3 px-5">Démarrez l'expèrience</a>
-                    </div>
+                        
+                    <!--<a href="concession.html" target="_parent" class="btn btn-dark text-uppercase mt-1 py-3 px-5">Démarrez l'expèrience</a>-->
+                </div>
 
                     <div id="photo-change" class="col-lg-6 px-0 text-right">
                         <label class="btn btn-primary button-primary btn-sm">
@@ -27,7 +28,7 @@
                         <img :src="image64" :key="image64" alt="Photo">
                     </div>
                 </div>   
-            </div>
+          </div>
     </header>
 </template>
   

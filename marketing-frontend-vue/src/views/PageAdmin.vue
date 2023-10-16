@@ -10,7 +10,7 @@
       MyNavbar,
       AppHeader,
       DropdownMenu,
-      AppFooter
+      AppFooter,
     },
 
     methods: {
