@@ -86,7 +86,6 @@
           </div>
         
         <b-card-group deck>
-          
           <div v-for="modele in modeles" :key="modele" >
               <b-card
                 v-if="modele.concession===concession"
@@ -96,11 +95,23 @@
                 style="max-width: 20rem;"
                 class="mb-2 pull-right "
                 >
-                <b-button @click="fermerModele(modele)" class="close position-absolute top-0 end-0 btn-danger custom-close-icon" aria-label="Close">
+                <b-button v-if="authToken" @click="fermerModele(modele)" class="close position-absolute top-0 end-0 btn-danger custom-close-icon" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </b-button>
-                <b-button href="#" variant="primary">Réserver une horaire</b-button>
-              </b-card>
+                <b-button :id="modele.concession+' '+modele.modele" @click="showPopover(model)">
+                  Réserver une horaire
+                </b-button>
+                <b-popover
+                  :target="modele.concession+' '+modele.modele"
+                  triggers="click"
+                  placement="top"
+                >
+                <div>
+                  <!-- Contenu du popover -->
+                  Contenu du Popover pour
+                </div>
+        </b-popover>
+          </b-card>
           </div>
         </b-card-group>  
       </div>  
@@ -120,6 +131,7 @@
   
   <script>
   import api from '../api/axiosInstance.js';
+  import Cookies from 'js-cookie';
   export default {
     data() {
     return {
@@ -143,6 +155,7 @@
         photo: '',
         concession:""
       },
+      authToken: Cookies.get('authToken'),
     };
   },
 
@@ -225,13 +238,14 @@ async fetchModeles() {
     const nouvelleConcession = this.concessionInput.trim();
     // Vérifiez si nouvelleConcession n'est pas vide avant de l'envoyer au serveur
     if (nouvelleConcession !== '' && !this.concessions.includes(nouvelleConcession)) {
-      this.concessions.push(nouvelleConcession);
+      
       try {
         await api.post('/concession', { nomConcession: nouvelleConcession });
         this.concessionInput = ''; // Réinitialiser l'entrée de la concession
       } catch (error) {
         console.error('Error adding concession:', error);
       }
+      this.fetchConcessions();
     }
   },
 
@@ -448,10 +462,11 @@ async ajouterAutomobile(concession) {
 
 <style scoped>
 .custom-close-icon {
+  color: black;
   top: 0.25rem;
   right: 0.5rem;
-  font-size: 3rem;
-  font-weight: lighter;
+  font-size: 4rem;
+  font-weight:solid;
   line-height: 1;
   opacity: .5;
 }

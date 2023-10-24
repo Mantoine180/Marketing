@@ -1,6 +1,7 @@
 const express = require('express');
 const modeles = express.Router();
 const { ModeleAutomobile,Concession } = require('../db'); // Importer l'instance Sequelize
+const verifyJWT = require('./jwtUtils.js'); 
 
 modeles.get('/', async (req, res) => {
   try {

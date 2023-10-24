@@ -5,6 +5,7 @@ const defineModeleAutomobile = require('./models/ModeleAutomobile');
 const defineCreneauHoraire = require('./models/CreneauHoraire');
 const defineConcession = require('./models/Concession');
 const defineInfo=require('./models/Infos') // Ajoutez ceci
+const defineAdmin=require('./models/Admin') // Ajoutez ceci
 
 // Initialisez Sequelize
 const sequelize = new Sequelize({
@@ -27,6 +28,7 @@ const ModeleAutomobile = defineModeleAutomobile(sequelize);
 const CreneauHoraire = defineCreneauHoraire(sequelize);
 const Concession = defineConcession(sequelize); // Ajoutez ceci
 const Infos=defineInfo(sequelize);
+const Admin=defineAdmin(sequelize);
 
 // Définissez les relations
 Client.belongsTo(Reservation, { as: 'reservation', foreignKey: 'reservationId' ,onDelete: 'CASCADE' });
@@ -51,5 +53,6 @@ module.exports = {
   Reservation,
   ModeleAutomobile,
   CreneauHoraire,
-  Concession // Ajoutez ceci
+  Concession, // Ajoutez ceci
+  Admin, // Ajoutez ceci
 };

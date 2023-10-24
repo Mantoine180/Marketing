@@ -1,7 +1,7 @@
 const express = require('express');
 const concessions = express.Router();
 const { Concession } = require('../db'); // Importer l'instance Sequelize
-
+const verifyJWT = require('./jwtUtils.js'); 
 
 concessions.get('/', async (req, res) => {
   try {
@@ -20,14 +20,14 @@ concessions.get('/', async (req, res) => {
   }
 });
 
-concessions.post('/', async (req, res) => {
+concessions.post('/',verifyJWT, async (req, res) => {
   const data = req.body;
 
   const concessionCreated = await Concession.create(data);
   res.json(concessionCreated);
 });
 
-concessions.delete('/', async (req, res) => {
+concessions.delete('/',verifyJWT,  async (req, res) => {
   try {
     // Effacer toutes les données de la table Concession
     await Concession.destroy({
@@ -42,7 +42,7 @@ concessions.delete('/', async (req, res) => {
   }
 });
 
-concessions.delete('/:concession', async (req, res) => {
+concessions.delete('/:concession',verifyJWT,  async (req, res) => {
   const { concession } = req.params;
   
   try {

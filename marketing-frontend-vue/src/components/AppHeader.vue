@@ -1,27 +1,26 @@
 <template>
     <header id="background-color">
         <div class="container-fluid py-5 px-0 " style="margin-bottom: 45px;" :style="{ backgroundColor: backgroundColor }">
-            <button id="colorPicker"></button>
+            <button v-if="authToken " id="colorPicker"></button>
             <div class="row mx-0 align-items-center">
+              
                 <div class="col-lg-6 px-md-5 text-center text-lg-left">
 
                     <div id="nouveau-modele" class="row">
-                            <input type="text" class="col form-control form-control-sm" v-model="titre" @input="sauvegardeTitre">
-                            <input type="checkbox" id="blankCheckbox" class="col-auto" value="option1" aria-label="...">
-                            <h1 class="col-12 display-2 text-uppercase mb-3">{{titre}}</h1>
+                            <input v-if="authToken" type="text" class="col form-control form-control-sm" v-model="titre" @input="sauvegardeTitre">
+                            <h1 class="col-12 display-3 text-uppercase mb-3">{{titre}}</h1>
                     </div>
 
                     <div id="description-modele" class="form-group row">
                         <p class="text-dark mb-4 col-12"><big>{{description}}</big></p>
-                        <textarea v-model="description" @input="sauvegardeDescription" rows="1" class="form-control col"></textarea>
-                        <input type="checkbox" id="blankCheckbox" value="option1" aria-label="..." class="col-auto">
+                        <textarea v-if="authToken" v-model="description" @input="sauvegardeDescription" rows="1" class="form-control col"></textarea>
                     </div>    
                         
                     <!--<a href="concession.html" target="_parent" class="btn btn-dark text-uppercase mt-1 py-3 px-5">Démarrez l'expèrience</a>-->
                 </div>
 
-                    <div id="photo-change" class="col-lg-6 px-0 text-right">
-                        <label class="btn btn-primary button-primary btn-sm">
+                    <div class="col-lg-6 px-0 text-right">
+                        <label v-if="authToken" class="btn btn-primary button-primary btn-sm">
                             Changer la photo
                             <input type="file" @change="handleImageChange" style="display: none;">
                         </label>
@@ -34,7 +33,7 @@
   
   <script>
   import api from '../api/axiosInstance.js';
-  
+  import Cookies from 'js-cookie';
   export default {
     data() {
     return {
@@ -42,6 +41,8 @@
       titre:"Veuillez mettre le modèle",
       description: "Voici le texte qui contiendra la description du salon ainsi que des modèles automobiles mis en vente",
       image64: "",
+      authToken: Cookies.get('authToken'),
+
     };
   },
 
@@ -127,6 +128,9 @@
 
   mounted() {
     this.fetchInfos();
+    if(this.authToken  ){
+
+    
     const pickr = Pickr.create({
       el: '#colorPicker',
       theme: 'classic',
@@ -151,6 +155,7 @@
       this.saveColor();
       pickr.hide();
     });
+  }
   },
   }
   </script>

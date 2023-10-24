@@ -1,6 +1,7 @@
 const express = require('express');
 const reservation = express.Router();
 const { Reservation,ModeleAutomobile} = require('../db'); // Importer l'instance Sequelize
+const verifyJWT = require('./jwtUtils.js'); 
 
 reservation.get('/idconcession', async (req, res) => { 
   const modele = req.query.modele;
@@ -29,7 +30,7 @@ reservation.get('/idconcession', async (req, res) => {
 
 
   
-reservation.post('/', async (req, res) => {
+reservation.post('/',verifyJWT,  async (req, res) => {
   try {
     // Prenez les données du corps de la requête
     const { quantiteMax,creneauId,modeleId } = req.body; // Utilisez "modele" sans accent
@@ -49,4 +50,4 @@ reservation.post('/', async (req, res) => {
   }
 });
 
-    module.exports = reservation;    
+module.exports = reservation;    

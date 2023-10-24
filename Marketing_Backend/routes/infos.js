@@ -1,8 +1,9 @@
 const express = require('express');
 const infos = express.Router();
 const { Infos } = require('../db'); // Importer l'instance Sequelize
+const verifyJWT = require('./jwtUtils.js'); 
 
-infos.put('/', async (req, res) => {
+infos.put('/',verifyJWT,  async (req, res) => {
     try {
       const existingInfo = await Infos.findOne();
       if (existingInfo) {
@@ -21,7 +22,7 @@ infos.put('/', async (req, res) => {
     }
 });
 
-infos.post('/', async (req, res) => {
+infos.post('/',verifyJWT,  async (req, res) => {
     try {
         const newInfo = await Infos.create();
         return res.status(201).json(newInfo);

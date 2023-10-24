@@ -1,9 +1,9 @@
 const express = require('express');
 const horaires = express.Router();
 const { CreneauHoraire } = require('../db'); // Importer l'instance Sequelize
+const verifyJWT = require('./jwtUtils.js'); 
 
-
-horaires.get('/', async (req, res) => {
+horaires.get('/',async (req, res) => {
   try {
     const horaires = await CreneauHoraire.findAll();
 
@@ -24,7 +24,7 @@ horaires.get('/', async (req, res) => {
 });
 
 
-  horaires.post('/', async (req, res) => {
+  horaires.post('/',verifyJWT,  async (req, res) => {
     try {
       const horairesData = req.body.horaires; // Assurez-vous que le client envoie les données du tableau horaires dans le corps de la requête POST
       if (!horairesData || !Array.isArray(horairesData)) {
@@ -46,7 +46,7 @@ horaires.get('/', async (req, res) => {
     }
   });
 
-  horaires.delete('/', async (req, res) => {
+  horaires.delete('/',verifyJWT,  async (req, res) => {
     try {
       await CreneauHoraire.destroy({ where: {} });
       res.status(200).json({ message: 'Horaires deleted successfully' });

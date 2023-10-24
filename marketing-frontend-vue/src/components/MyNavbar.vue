@@ -5,8 +5,8 @@
                 <router-link to="/" class="navbar-brand text-secondary">
                     <h1 class="display-4 text-uppercase">{{titre}}</h1>
                 </router-link> 
-                <input type="text" class="form-control form-control-sm col-md-3 mb-3" v-model="titre" @input="sauvegardeTitre">
-                <input type="checkbox" id="blankCheckbox" value="option1" aria-label="...">
+                <input v-if="authToken " type="text" class="form-control form-control-sm col-md-3 mb-3" v-model="titre" @input="sauvegardeTitre">
+                <input  type="checkbox" id="blankCheckbox" value="option1" aria-label="...">
             
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav ml-auto">
@@ -22,11 +22,13 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie';
 import api from '../api/axiosInstance.js';
 export default {
     name: "MyNavbar",
     data() {
         return {
+            authToken: Cookies.get('authToken'),
             titre: "Veuillez mettre la date de l'exposition"
         };
     },
@@ -34,6 +36,7 @@ export default {
     methods: {
         async fetchTitre() {
             try {
+                
                 const response = await api.get('/infos');
                 this.titre = response.data.annonce;
                 if (this.titre === "" || this.titre === null) {
@@ -47,7 +50,7 @@ export default {
         async sauvegardeTitre() {
         try {
             const response = await api.put('/infos', { annonce: this.titre });
-
+            console.log(this.authToken);
             if (response.status === 200) {
                 console.log('Titre updated successfully');
             }
