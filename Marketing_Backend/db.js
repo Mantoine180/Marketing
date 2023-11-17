@@ -6,6 +6,7 @@ const defineCreneauHoraire = require('./models/CreneauHoraire');
 const defineConcession = require('./models/Concession');
 const defineInfo=require('./models/Infos') // Ajoutez ceci
 const defineAdmin=require('./models/Admin') // Ajoutez ceci
+const defineClientReservation=require('./models/ClientReservation') // Ajoutez ceci
 
 // Initialisez Sequelize
 const sequelize = new Sequelize({
@@ -29,10 +30,21 @@ const CreneauHoraire = defineCreneauHoraire(sequelize);
 const Concession = defineConcession(sequelize); // Ajoutez ceci
 const Infos=defineInfo(sequelize);
 const Admin=defineAdmin(sequelize);
+const ClientReservation=defineClientReservation(sequelize); // Ajoutez ceci
 
 // Définissez les relations
-Client.belongsTo(Reservation, { as: 'reservation', foreignKey: 'reservationId' ,onDelete: 'CASCADE' });
-Reservation.hasOne(Client, { as: 'client', foreignKey: 'reservationId' ,onDelete: 'CASCADE'});
+Client.belongsToMany(Reservation, {
+  through: 'ClientReservations',
+  foreignKey: 'clientId', // Nom de la colonne pour la clé étrangère client_id
+  otherKey: 'reservationId' // Nom de la colonne pour la clé étrangère reservation_id
+});
+
+Reservation.belongsToMany(Client, {
+  through: 'ClientReservations',
+  foreignKey: 'reservationId', // Nom de la colonne pour la clé étrangère reservation_id
+  otherKey: 'clientId' // Nom de la colonne pour la clé étrangère client_id
+});
+
 
 Reservation.belongsTo(ModeleAutomobile, { as: 'modele', foreignKey: 'modeleId' ,onDelete: 'CASCADE'});
 ModeleAutomobile.hasMany(Reservation, { as: 'reservations', foreignKey: 'modeleId' ,onDelete: 'CASCADE'});
@@ -55,4 +67,5 @@ module.exports = {
   CreneauHoraire,
   Concession, // Ajoutez ceci
   Admin, // Ajoutez ceci
+  ClientReservation // Ajoutez ceci
 };

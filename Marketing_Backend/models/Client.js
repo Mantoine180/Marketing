@@ -22,15 +22,13 @@ module.exports = (sequelize) => {
     telephone: {
       type: DataTypes.STRING,
     },
-    reservationId: {
-      type: DataTypes.INTEGER,
-      references:{
-      model:'Reservation',
-      key:'id'
-      }
-      
-    }
   });
 
+  Client.associate = (models) => {
+    Client.belongsToMany(models.Reservation, {
+      through: models.ClientReservation,
+      foreignKey: 'clientId', // Clé étrangère dans la table intermédiaire
+    });
+  };
   return Client;
 };

@@ -32,7 +32,7 @@
         </div>
 
         <div class="section" v-if="section === 'section2'">
-            <form @submit.prevent="ajouterHoraires">
+            <form v-if="horaires.length===0" @submit.prevent="ajouterHoraires">
               <input type="time" v-model="morningStart" min="08:00" max="11:00" required>
               <small>Choisir l'heure de début du matin</small><br>
           
@@ -46,7 +46,7 @@
               <small>Choisir l'heure de fin de l'après-midi</small><br>
           
               <input type="number" class="form-control" v-model="ecartCreneaux" placeholder="Ecart entre les créneaux">    
-              <button type="submit" class="btn btn-primary">Valider</button>
+              <button  type="submit" class="btn btn-primary">Valider</button>
             </form>   
             <div v-for="horaire in horaires" :key="horaire">
               <h3 class="text-center">{{horaire}}</h3>
@@ -62,7 +62,7 @@
               Ajouter un modèle
             </button>
             <b-popover :target="'popover-' + concession" >
-              <template #default>
+              
                 <form @submit.prevent="ajouterAutomobile(concession)">
                   <div class="form-group">
                     <label>Nom du modèle</label>
@@ -81,7 +81,7 @@
 
                   <button type="submit" class="btn btn-primary">Créer modèle</button>
                 </form>
-              </template>
+             
             </b-popover>
           </div>
         
@@ -89,29 +89,118 @@
           <div v-for="modele in modeles" :key="modele" >
               <b-card
                 v-if="modele.concession===concession"
+                :id="modele.concession+' '+modele.modele"
                 :title="modele.modele"
                 :img-src="modele.photo"
                 img-alt="Image"
                 style="max-width: 20rem;"
                 class="mb-2 pull-right "
                 >
-                <b-button v-if="authToken" @click="fermerModele(modele)" class="close position-absolute top-0 end-0 btn-danger custom-close-icon" aria-label="Close">
+                <b-button v-if="authToken"  @click="fermerModele(modele)" class="close position-absolute top-0 end-0 btn-danger custom-close-icon" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </b-button>
-                <b-button :id="modele.concession+' '+modele.modele" @click="showPopover(model)">
-                  Réserver une horaire
-                </b-button>
+                
+
                 <b-popover
+                  triggers="hover focus"
                   :target="modele.concession+' '+modele.modele"
-                  triggers="click"
-                  placement="top"
+                  placement="right"
                 >
-                <div>
-                  <!-- Contenu du popover -->
-                  Contenu du Popover pour
-                </div>
-        </b-popover>
-          </b-card>
+                  
+                  <div>
+                    <b-form-group
+                      label="Nom"
+                      label-for="popover-input-1"
+                      label-cols="3"
+                      :state="input1state"
+                      class="mb-1"
+                      description="Entrer votre nom"
+                      invalid-feedback="Ce champ est requis"
+                    >
+                      <b-form-input
+                        ref="input1"
+                        id="popover-input-1"
+                        :state="input1state"
+                        v-model="nom"
+                        size="sm"
+                      ></b-form-input>
+                    </b-form-group>
+
+                    <b-form-group
+                      label="Prenom"
+                      label-for="popover-input-2"
+                      label-cols="3"
+                      :state="input2state"
+                      class="mb-1"
+                      description="Entrer votre prenom"
+                      invalid-feedback="Ce champ est requis"
+                    >
+                      <b-form-input
+                        ref="input1"
+                        id="popover-input-2"
+                        :state="input2state"
+                        v-model="prenom"
+                        size="sm"
+                      ></b-form-input>
+                    </b-form-group>
+
+                    <b-form-group
+                      label="Email"
+                      label-for="popover-input-3"
+                      label-cols="3"
+                      :state="input1state"
+                      class="mb-1"
+                      description="Entrer votre email"
+                      invalid-feedback="Ce champ est requis"
+                    >
+                    <b-form-input
+                        ref="input1"
+                        id="popover-input-3"
+                        :state="input1state"
+                        v-model="email"
+                        size="sm"
+                      ></b-form-input>
+                    </b-form-group>
+
+                    <b-form-group
+                      label="Telephone"	
+                      label-for="popover-input-4"
+                      label-cols="4"
+                      :state="input4state"
+                      class="mb-1"
+                      description="Entrer votre numero de telephone"
+                      invalid-feedback="Ce champ est requis"
+                    >
+                    <b-form-input
+                        ref="input1"
+                        id="popover-input-4"
+                        v-model="telephone"
+                        :state="input4state"
+                        size="sm"
+                      ></b-form-input>
+                    </b-form-group>
+
+                    <b-form-group
+                      label="Horaires"
+                      label-for="popover-input-2"
+                      label-cols="3"
+                      :state="input5state"
+                      class="mb-1"
+                      description="Choisir un horaire"
+                      invalid-feedback="Ce champ est requis"
+                    >
+                      <b-form-select
+                        ref="input2"
+                        id="popover-input-5"
+                        :state="input5state"
+                        size="sm"
+                        :options="modele.horaires"
+                      ></b-form-select>
+                    </b-form-group>
+                    <b-button @click="onOk(modele)" size="sm" variant="primary">Ok</b-button>
+                  </div>                 
+                </b-popover>
+              </b-card>
           </div>
         </b-card-group>  
       </div>  
@@ -136,6 +225,8 @@
     data() {
     return {
       horaires:[],
+      horaires_automobiles: [],
+      horaires_id:[],
       concessions: [],
       modeles: [],
       section: '',
@@ -153,9 +244,17 @@
       newModele:{
         modele: "",
         photo: '',
-        concession:""
+        concession:"",
+        modele_id: null,
       },
+
       authToken: Cookies.get('authToken'),
+
+      nom:'', // Propriété pour stocker la valeur du nom',
+      prenom:'',
+      email:'',
+      telephone:'',
+      horaire:'',
     };
   },
 
@@ -167,7 +266,35 @@
     }
   },
   methods: {
-  
+    /*closePopoverOnClickOutside(modele) {
+      console.log('closePopoverOnClickOutside');
+      this.$root.$emit('bv::hide::popover', modele.concession + ' ' + modele.modele);  
+    },*/
+
+    async onOk(modele){
+      console.log('onOk');
+
+      console.log(modele.modele_id,this.telephone);
+
+      const [heureDebut] = this.horaire.split(' - ');
+      const horaireDebut = heureDebut.trim();
+
+
+      console.log(horaireDebut);
+      try {
+        const response = await api.post(`/client`,{
+        horaire:horaireDebut,
+        nom:this.nom,
+        prenom:this.prenom,
+        email:this.email,
+        telephone:this.telephone,
+        modele_id:modele.modele_id,
+      });
+        console.log(response.data);
+      } catch (error) {
+        console.error('Error sending reservation:', error);
+      }
+    },
     /**************************************************************************************
     * 
     * Chercher une concession dans la base de données
@@ -177,7 +304,7 @@
   try {
     const response = await api.get('/concession');
     this.concessions = response.data;
-    console.log(this.concessions);
+    
   } catch (error) {
     console.error('Error fetching concessions:', error);
   }
@@ -200,6 +327,7 @@ async fetchHoraires() {
     });
 
     this.horaires = formattedHoraires;
+
   } catch (error) {
     console.error('Error fetching horaires:', error);
   }
@@ -218,11 +346,37 @@ async fetchHorairesId() {
       }
 },
 
+async fetchHorairesAutomobiles(){
+  try {
+    const response = await api.get(`/horaires/spehoraires`);
+    this.horaires_automobiles = response.data;
+    this.modeles.forEach((modele) => {
+    const modeleId = modele.modele_id;
+    const horairesCorrespondants = this.horaires_automobiles.find(
+      (automobile) => automobile.id === modeleId
+    );
+
+    if (horairesCorrespondants) {
+    const horairesString = horairesCorrespondants.horaires
+      .map((horaire) => `${horaire.heureDebut} - ${horaire.heureFin}`)
+     // Pour obtenir une chaîne avec toutes les plages horaires séparées par des virgules
+    modele.horaires = horairesString;
+}  else {
+      modele.horaires = []; // Si aucun horaire correspondant n'est trouvé
+    }
+    console.log("Hola",modele.horaires);
+    console.log(this.horaires);
+});
+
+  } catch (error) {
+    console.error('Error fetching horaires_automobiles:', error);
+  }
+},
+
 async fetchModeles() {
   try {
     const response = await api.get(`/modeles`);
     this.modeles = response.data;
-    console.log(this.modeles);
   } catch (error) {
     console.error('Error fetching modeles:', error);
   }
@@ -403,8 +557,10 @@ async ajouterAutomobile(concession) {
           modele: this.newModele.modele,
           concessionId: concessions_id,
           photo: this.newModele.photo,
+          quantiteMax: nbPlaces,
         });
         this.fetchModeles(); 
+
 
         // Récupérer l'ID du modèle automobile juste après qu'il soit créé
         const params = new URLSearchParams({ concessionId: concessions_id, modele: this.newModele.modele});
@@ -415,7 +571,6 @@ async ajouterAutomobile(concession) {
         // Effectuer les requêtes POST vers le serveur pour mettre en place les réservations
         const reservations = this.horaires_id.map(creneauId => 
           api.post('/reservation', {
-            quantiteMax: nbPlaces,
             creneauId,
             modeleId: modele_id
           })
@@ -423,7 +578,7 @@ async ajouterAutomobile(concession) {
 
         await Promise.all(reservations);
         console.log('All reservations made successfully!');
-
+        
       } 
       catch (error) {
         console.error('Error:', error);
@@ -454,6 +609,13 @@ async ajouterAutomobile(concession) {
     this.fetchConcessions();
     this.fetchHoraires();
     this.fetchHorairesId();
+
+    setInterval(() => {
+      this.fetchHorairesAutomobiles();
+    }, 1000); // Appeler la fonction toutes les 1000 millisecondes (1 seconde)
+
+    
+    
     this.fetchModeles(); 
   },
  
@@ -461,6 +623,7 @@ async ajouterAutomobile(concession) {
   </script>
 
 <style scoped>
+
 .custom-close-icon {
   color: black;
   top: 0.25rem;

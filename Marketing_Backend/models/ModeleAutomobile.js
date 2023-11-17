@@ -10,6 +10,10 @@ module.exports = (sequelize) => {
       type: DataTypes.TEXT,
       allowNull: true
     },
+    quantiteMax: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
     concessionId: {
       type: DataTypes.INTEGER,
       references: {

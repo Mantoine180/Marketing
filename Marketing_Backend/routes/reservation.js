@@ -33,14 +33,14 @@ reservation.get('/idconcession', async (req, res) => {
 reservation.post('/',verifyJWT,  async (req, res) => {
   try {
     // Prenez les données du corps de la requête
-    const { quantiteMax,creneauId,modeleId } = req.body; // Utilisez "modele" sans accent
+    const {creneauId,modeleId } = req.body; // Utilisez "modele" sans accent
     // Validation
-    if (!quantiteMax || !creneauId|| !modeleId) {
+    if (!creneauId|| !modeleId) {
       return res.status(400).json({ message: 'Modèle et concessionId sont nécessaires' });
     }
 
     // Insérez le nouveau modèle
-    const newReservation = await Reservation.create({ quantiteReservee:0, quantiteMax:quantiteMax,modeleId:modeleId,creneauId:creneauId });
+    const newReservation = await Reservation.create({ quantiteReservee:0,modeleId:modeleId,creneauId:creneauId });
     // Répondez avec succès
     res.status(201).json(newReservation);
     

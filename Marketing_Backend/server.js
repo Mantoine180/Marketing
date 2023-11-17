@@ -6,6 +6,7 @@ const modeles = require('./routes/modeles');
 const reservation = require('./routes/reservation');
 const infos = require('./routes/infos');
 const admin = require('./routes/admin');
+const client = require('./routes/client');
 
 const { sequelize } = require('./db'); // Importer l'instance Sequelize
 const cors = require('cors');
@@ -26,6 +27,7 @@ app.use('/api/modeles', modeles);
 app.use('/api/reservation', reservation);
 app.use('/api/infos', infos);
 app.use('/api/admin', admin);
+app.use('/api/client', client);
 
 sequelize
   .authenticate()

@@ -6,10 +6,6 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    quantiteMax: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
     modeleId: {
       type: DataTypes.INTEGER,
       references: {
@@ -26,6 +22,12 @@ module.exports = (sequelize) => {
     }
   });
 
+  Reservation.associate = (models) => {
+    Reservation.belongsToMany(models.Client, {
+      through: models.ClientReservation,
+      foreignKey: 'reservationId', // Clé étrangère dans la table intermédiaire
+    });
+  };
   return Reservation;
 };
 

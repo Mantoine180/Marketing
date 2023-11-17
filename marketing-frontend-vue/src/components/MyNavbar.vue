@@ -2,16 +2,16 @@
     <div class="container-fluid bg-white position-relative">
         <nav class="navbar navbar-expand-xl bg-white navbar-light py-3 py-lg-0">
 
-                <router-link to="/" class="navbar-brand text-secondary">
+                
                     <h1 class="display-4 text-uppercase">{{titre}}</h1>
-                </router-link> 
+               
                 <input v-if="authToken " type="text" class="form-control form-control-sm col-md-3 mb-3" v-model="titre" @input="sauvegardeTitre">
                 <input  type="checkbox" id="blankCheckbox" value="option1" aria-label="...">
             
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav ml-auto">
                     <div class="d-none d-xl-flex align-items-center pl-4"> 
-                        <img src="img/GROUPEPEYROT_Logo_RVB_Positif_72dpi_ok_format_logo.png" width="300">
+                        <img src="../assets/logo.png" width="300">
                     </div>
                 </ul>
             </div>
@@ -40,7 +40,7 @@ export default {
                 const response = await api.get('/infos');
                 this.titre = response.data.annonce;
                 if (this.titre === "" || this.titre === null) {
-                    this.titre = "Veuillez mettre le modèle";
+                    this.titre = "Veuillez mettre la date de l'exposition";
                 }
             } catch (error) {
                 console.error('Error fetching titre:', error);
@@ -66,3 +66,9 @@ export default {
     }
 }
 </script>
+<style scoped>
+   h1 {
+    font-size: 3.5rem;
+    margin-left: 50px;
+   }
+  </style>

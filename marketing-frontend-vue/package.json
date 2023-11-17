@@ -19,7 +19,9 @@
     "bootstrap-vue-3": "^0.5.1",
     "js-cookie": "^3.0.5",
     "pinia": "^2.1.6",
+    "v-click-outside": "^3.2.0",
     "vue": "^3.3.4",
+    "vue-click-outside-component": "^1.0.3",
     "vue-router": "^4.2.4",
     "vuex": "^4.1.0"
   },

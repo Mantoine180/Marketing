@@ -23,9 +23,9 @@
         ></b-form-input>
       </b-form-group>
 
-      <b-button type="submit" variant="primary">Login</b-button>
+      <b-button type="submit" class="mb-3" variant="primary">Login</b-button>
+      <b-button @click="onLogout" variant="danger" class="logout-button">Logout</b-button>
     </b-form>
-
     <!-- Afficher les messages d'erreur ici -->
     <div v-if="errorMessage" class="error-message">
       {{ errorMessage }}
@@ -79,6 +79,14 @@ export default {
             this.errorMessage = 'Une erreur est survenue lors de l\'authentification.';
           }
         });
+    },
+
+    async onLogout(event) {
+      event.preventDefault();
+      Cookies.remove('authToken');
+      Cookies.remove('user');
+      alert('Déconnexion réussie');
+      this.$router.push('/admin');
     }
   },
 };
@@ -143,5 +151,8 @@ img {
 .error-message {
   color: red;
   margin-top: 10px;
+}
+.login-form button.logout-button {
+  background-color: #dc3545; /* Couleur rouge de Bootstrap 'danger' */
 }
 </style>

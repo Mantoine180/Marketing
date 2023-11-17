@@ -6,10 +6,10 @@
               
                 <div class="col-lg-6 px-md-5 text-center text-lg-left">
 
-                    <div id="nouveau-modele" class="row">
+                   
                             <input v-if="authToken" type="text" class="col form-control form-control-sm" v-model="titre" @input="sauvegardeTitre">
                             <h1 class="col-12 display-3 text-uppercase mb-3">{{titre}}</h1>
-                    </div>
+                    
 
                     <div id="description-modele" class="form-group row">
                         <p class="text-dark mb-4 col-12"><big>{{description}}</big></p>
@@ -160,3 +160,9 @@
   }
   </script>
   
+  <style scoped>
+   h1 {
+    font-size: 5.5rem;
+   }
+  </style>
+  ```

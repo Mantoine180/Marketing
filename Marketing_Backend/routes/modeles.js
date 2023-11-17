@@ -6,7 +6,7 @@ const verifyJWT = require('./jwtUtils.js');
 modeles.get('/', async (req, res) => {
   try {
     const models = await ModeleAutomobile.findAll({
-      attributes: ['modele', 'photo'],
+      attributes: ['modele', 'photo','id'],
       include: [
         {
           model: Concession,
@@ -20,7 +20,9 @@ modeles.get('/', async (req, res) => {
     const transformedModels = models.map((model) => ({
       modele: model.modele,
       photo: model.photo,
-      concession: model.concession ? model.concession.nomConcession : '', // Si la concession existe, incluez son nom, sinon une chaîne vide
+      concession: model.concession ? model.concession.nomConcession : '',
+      modele_id: model.id,
+       // Si la concession existe, incluez son nom, sinon une chaîne vide
     }));
 
     res.status(200).json(transformedModels);
@@ -58,14 +60,14 @@ modeles.get('/id/:concession', async (req, res) => {
 modeles.post('/', async (req, res) => {
   try {
     // Prenez les données du corps de la requête
-    const { modele, concessionId, photo} = req.body; // Utilisez "modele" sans accent
+    const { modele, concessionId, photo,quantiteMax} = req.body; // Utilisez "modele" sans accent
     // Validation
     if (!modele || !concessionId) {
       return res.status(400).json({ message: 'Modèle et concessionId sont nécessaires' });
     }
 
     // Insérez le nouveau modèle
-    const newModel = await ModeleAutomobile.create({ modele: modele, concessionId: concessionId,photo:photo });
+    const newModel = await ModeleAutomobile.create({ modele: modele, concessionId: concessionId,photo:photo,quantiteMax:quantiteMax});
     // Répondez avec succès
     res.status(201).json(newModel);
     
