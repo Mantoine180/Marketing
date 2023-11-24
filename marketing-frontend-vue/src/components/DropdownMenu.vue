@@ -62,7 +62,6 @@
               Ajouter un modèle
             </button>
             <b-popover :target="'popover-' + concession" >
-              
                 <form @submit.prevent="ajouterAutomobile(concession)">
                   <div class="form-group">
                     <label>Nom du modèle</label>
@@ -95,18 +94,26 @@
                 img-alt="Image"
                 style="max-width: 20rem;"
                 class="mb-2 pull-right "
+                tabindex="0" 
                 >
-                <b-button v-if="authToken"  @click="fermerModele(modele)" class="close position-absolute top-0 end-0 btn-danger custom-close-icon" aria-label="Close">
+                <b-button  @click="fermerModele(modele)" class="close position-absolute top-0 end-0 btn-danger custom-close-icon" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </b-button>
                 
 
                 <b-popover
-                  triggers="hover focus"
-                  :target="modele.concession+' '+modele.modele"
-                  placement="right"
+                :ref="`${modele.concession}-${modele.modele}`"
+                triggers="focus "
+                :target="modele.concession+' '+modele.modele"
+                placement="right"
+                
                 >
-                  
+                <template #title>
+                <!--<b-button @click="onClose(modele)" class="close position-absolute top-0 end-0 btn-danger custom-pop-close-icon" aria-label="Close">
+                  <span class="d-inline-block" aria-hidden="true">&times;</span>
+                </b-button>-->
+                    Essai de {{ modele.modele }}
+                </template>
                   <div>
                     <b-form-group
                       label="Nom"
@@ -172,9 +179,11 @@
                       invalid-feedback="Ce champ est requis"
                     >
                     <b-form-input
+                        type="tel"
                         ref="input1"
                         id="popover-input-4"
                         v-model="telephone"
+                        pattern="[0-9]"
                         :state="input4state"
                         size="sm"
                       ></b-form-input>
@@ -190,14 +199,16 @@
                       invalid-feedback="Ce champ est requis"
                     >
                       <b-form-select
+                        type="text"
                         ref="input2"
                         id="popover-input-5"
                         :state="input5state"
                         size="sm"
                         :options="modele.horaires"
+                        class="black-border"
                       ></b-form-select>
                     </b-form-group>
-                    <b-button @click="onOk(modele)" size="sm" variant="primary">Ok</b-button>
+                    <b-button @click="onOk(modele)" size="sm" variant="primary">Réserver mon essai</b-button>
                   </div>                 
                 </b-popover>
               </b-card>
@@ -291,6 +302,7 @@
         modele_id:modele.modele_id,
       });
         console.log(response.data);
+        await this.fetchHorairesAutomobiles();
       } catch (error) {
         console.error('Error sending reservation:', error);
       }
@@ -441,53 +453,64 @@ async fetchModeles() {
     * 
     ***************************************************************************************/
   async ajouterHoraires() {
-  // Utilisez les valeurs des propriétés pour appeler votre fonction ajouterHoraires()
-  const values = {
-    morningStart: this.morningStart,
-    pauseTime: this.pauseTime,
-    afternoonStart: this.afternoonStart,
-    afternoonEnd: this.afternoonEnd,
-    ecartCreneaux: this.ecartCreneaux,
-  };
-
-  // Appelez votre fonction ajouterHoraires() avec les valeurs récupérées
-  console.log(values);
-
-  let morningStartObj = new Date(`2000-01-01T${values.morningStart}:00`);
-  let morningPauseObj = new Date(`2000-01-01T${values.pauseTime}:00`);
-  let afternoonStartObj = new Date(`2000-01-01T${values.afternoonStart}:00`);
-  let afternoonEndObj = new Date(`2000-01-01T${values.afternoonEnd}:00`);
-
-  this.ajoutertableau(morningStartObj, morningPauseObj, values.ecartCreneaux);
-  this.ajoutertableau(afternoonStartObj, afternoonEndObj, values.ecartCreneaux);
-
-  const horairesData = this.horaires.map(h => {
-    const [heureDebut, heureFin] = h.split(' - ');
-    return {
-      heureDebut: heureDebut.trim(),
-      heureFin: heureFin.trim(),
+    const values = {
+      morningStart: this.morningStart,
+      pauseTime: this.pauseTime,
+      afternoonStart: this.afternoonStart,
+      afternoonEnd: this.afternoonEnd,
+      ecartCreneaux: this.ecartCreneaux,
     };
-  });
 
-  try {
-    const response = await api.post('/horaires', { horaires: horairesData });
-    console.log(response.data);
-  } catch (error) {
-    console.error('Error sending horaires:', error);
-  }
-  this.fetchHorairesId();
-},
+    this.createHoraires(values);
 
-ajoutertableau(debut, fin, ecartCreneaux) {
-  while (debut < fin) {
-    const heureDebutCreneau = debut.toTimeString().slice(0, 5);
-    debut.setMinutes(debut.getMinutes() + ecartCreneaux);
-    const heureFinCreneau = debut.toTimeString().slice(0, 5);
-    if (debut <= fin) {
-      this.horaires.push(`${heureDebutCreneau} - ${heureFinCreneau}`);
+    try {
+      const response = await this.sendHoraires();
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error sending horaires:', error);
     }
-  }
-},
+
+    this.fetchHorairesId();
+    this.fetchHorairesAutomobiles();
+  },
+
+  createHoraires(values) {
+    const morningStartObj = this.createDateObject(values.morningStart);
+    const morningPauseObj = this.createDateObject(values.pauseTime);
+    const afternoonStartObj = this.createDateObject(values.afternoonStart);
+    const afternoonEndObj = this.createDateObject(values.afternoonEnd);
+
+    this.ajoutertableau(morningStartObj, morningPauseObj, values.ecartCreneaux);
+    this.ajoutertableau(afternoonStartObj, afternoonEndObj, values.ecartCreneaux);
+  },
+
+  createDateObject(time) {
+    return new Date(`2000-01-01T${time}:00`);
+  },
+
+  async sendHoraires() {
+    const horairesData = this.horaires.map(h => {
+      const [heureDebut, heureFin] = h.split(' - ');
+      return {
+        heureDebut: heureDebut.trim(),
+        heureFin: heureFin.trim(),
+      };
+    });
+
+    return await api.post('/horaires', { horaires: horairesData });
+    
+  },
+
+  ajoutertableau(debut, fin, ecartCreneaux) {
+    while (debut < fin) {
+      const heureDebutCreneau = debut.toTimeString().slice(0, 5);
+      debut.setMinutes(debut.getMinutes() + ecartCreneaux);
+      const heureFinCreneau = debut.toTimeString().slice(0, 5);
+      if (debut <= fin) {
+        this.horaires.push(`${heureDebutCreneau} - ${heureFinCreneau}`);
+      }
+    }
+  },
 
 async supprimerHoraires() {
   this.horaires = [];
@@ -583,6 +606,7 @@ async ajouterAutomobile(concession) {
       catch (error) {
         console.error('Error:', error);
       }
+      await this.fetchHorairesAutomobiles();
     }
   },
 
@@ -605,18 +629,12 @@ async ajouterAutomobile(concession) {
 }
 
 },
-  mounted(){
+  async mounted(){
     this.fetchConcessions();
     this.fetchHoraires();
     this.fetchHorairesId();
-
-    setInterval(() => {
-      this.fetchHorairesAutomobiles();
-    }, 1000); // Appeler la fonction toutes les 1000 millisecondes (1 seconde)
-
-    
-    
     this.fetchModeles(); 
+    await this.fetchHorairesAutomobiles();
   },
  
 }
@@ -632,5 +650,31 @@ async ajouterAutomobile(concession) {
   font-weight:solid;
   line-height: 1;
   opacity: .5;
+}
+
+.custom-pop-close-icon {
+  color: rgb(0, 0, 0);
+  top: 0px;
+  right: 0.5rem;
+  font-size: 4rem;
+  font-weight:solid;
+ line-height: 0.5;
+  opacity: .5;
+}
+.row{
+  --bs-gutter-x: 0rem;  
+}
+
+h1 {
+  border-width: 20px;
+}
+
+.black-border {
+  border-color: #000000 !important;
+}
+
+.popover {
+  margin-left: 200px;
+  border-width: 200px;
 }
 </style>

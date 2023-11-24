@@ -6,7 +6,7 @@
                     <h1 class="display-4 text-uppercase">{{titre}}</h1>
                
                 <input v-if="authToken " type="text" class="form-control form-control-sm col-md-3 mb-3" v-model="titre" @input="sauvegardeTitre">
-                <input  type="checkbox" id="blankCheckbox" value="option1" aria-label="...">
+                
             
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav ml-auto">

@@ -5,7 +5,7 @@
  * Copyright 2011-2020 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
- :root {
+ /*:root {
     --blue: #007bff;
     --indigo: #6610f2;
     --purple: #6f42c1;
@@ -6085,7 +6085,7 @@
     color: #686A6F;
   }
   */
-  .carousel {
+  /*.carousel {
     position: relative;
   }
   
@@ -19926,7 +19926,7 @@
     display: flex;
     flex-wrap: nowrap; 
     align-items: center;
-  }
+  }*/
   
   .btn-group.full-width {
     display: flex;
@@ -19955,4 +19955,10 @@
   .nom_concession{
     margin-left: 500px;
   }
+  
+  .popover {
+    border-width: 1px;
+    border-color: #000000;
+  }
+
   

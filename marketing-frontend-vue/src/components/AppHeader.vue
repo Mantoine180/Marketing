@@ -5,16 +5,11 @@
             <div class="row mx-0 align-items-center">
               
                 <div class="col-lg-6 px-md-5 text-center text-lg-left">
-
-                   
                             <input v-if="authToken" type="text" class="col form-control form-control-sm" v-model="titre" @input="sauvegardeTitre">
-                            <h1 class="col-12 display-3 text-uppercase mb-3">{{titre}}</h1>
-                    
-
-                    <div id="description-modele" class="form-group row">
+                            <h1 class="col-12 display-3 text-uppercase mb-3">{{titre}}</h1>  
                         <p class="text-dark mb-4 col-12"><big>{{description}}</big></p>
                         <textarea v-if="authToken" v-model="description" @input="sauvegardeDescription" rows="1" class="form-control col"></textarea>
-                    </div>    
+                      
                         
                     <!--<a href="concession.html" target="_parent" class="btn btn-dark text-uppercase mt-1 py-3 px-5">Démarrez l'expèrience</a>-->
                 </div>

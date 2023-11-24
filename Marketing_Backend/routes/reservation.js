@@ -30,7 +30,7 @@ reservation.get('/idconcession', async (req, res) => {
 
 
   
-reservation.post('/',verifyJWT,  async (req, res) => {
+reservation.post('/',  async (req, res) => {
   try {
     // Prenez les données du corps de la requête
     const {creneauId,modeleId } = req.body; // Utilisez "modele" sans accent

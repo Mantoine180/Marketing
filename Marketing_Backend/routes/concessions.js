@@ -20,14 +20,14 @@ concessions.get('/', async (req, res) => {
   }
 });
 
-concessions.post('/',verifyJWT, async (req, res) => {
+concessions.post('/', async (req, res) => {
   const data = req.body;
 
   const concessionCreated = await Concession.create(data);
   res.json(concessionCreated);
 });
 
-concessions.delete('/',verifyJWT,  async (req, res) => {
+concessions.delete('/',  async (req, res) => {
   try {
     // Effacer toutes les données de la table Concession
     await Concession.destroy({
@@ -42,7 +42,7 @@ concessions.delete('/',verifyJWT,  async (req, res) => {
   }
 });
 
-concessions.delete('/:concession',verifyJWT,  async (req, res) => {
+concessions.delete('/:concession',  async (req, res) => {
   const { concession } = req.params;
   
   try {
